@@ -1,929 +1,1559 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PixelVault — Stock Photography & Video</title>
-    <meta name="description" content="License world-class photography and 4K video from independent creators." />
+    <title>Natbios Stock — License World-Class Nature & Wildlife</title>
+    <meta name="description"
+        content="Premium nature and wildlife photography and 4K video licensed by independent creators. Built for filmmakers, designers, and storytellers." />
 
-    <!-- =====================================================================
-         FONTS
-         Inter for UI chrome (labels, buttons, metadata).
-         Playfair Display for hero text — gives the site a premium editorial feel.
-    ====================================================================== -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
-
-    <!-- =====================================================================
-         SUPABASE JS — loaded from the official CDN.
-         We use the ESM (module) build so we can do clean named imports in app.js
-         without any build step or bundler.
-         Pin to a specific minor version so a CDN update never breaks production.
-    ====================================================================== -->
-    <!-- No <script> tag needed here — we import it as an ES module in app.js -->
+    <!-- Cormorant Garamond: editorial serif for display — evokes wildlife documentaries and nature journals -->
+    <!-- DM Sans: clean, modern utility face for body and UI -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet" />
 
     <style>
-        /* ==================================================================
-           CSS CUSTOM PROPERTIES (Design Tokens)
-           Change these 8 lines to retheme the entire site.
-        ================================================================== */
+        /* ====================================================================
+           DESIGN TOKENS
+           Palette: near-black canvas, deep violet signature, warm off-white text
+           Signature element: full-bleed cinematic hero with diagonal text crop
+        ==================================================================== */
         :root {
-            --c-bg:          #0f0f0f;   /* Near-black canvas */
-            --c-surface:     #1a1a1a;   /* Card / modal background */
-            --c-surface-2:   #242424;   /* Hover state for cards */
-            --c-border:      #2e2e2e;   /* Subtle dividers */
-            --c-accent:      #3a7c4c;   /* Warm gold — the signature colour */
-            --c-accent-dark: #4ba05b;   /* Pressed / hover state for accent */
-            --c-text:        #f0ede6;   /* Primary text — warm white */
-            --c-text-muted:  #888880;   /* Secondary / metadata text */
+            /* Core palette */
+            --ink: #09090f;
+            /* Deepest black — canvas */
+            --ink-2: #111119;
+            /* Card backgrounds */
+            --ink-3: #1a1a27;
+            /* Elevated surfaces */
+            --border: #ffffff0f;
+            /* Ghost borders */
+            --border-lit: #ffffff1a;
+            /* Lit borders on hover */
 
-            --font-display:  'Playfair Display', Georgia, serif;
-            --font-ui:       'Inter', system-ui, sans-serif;
+            /* Violet signature */
+            --violet: #3a7c4c;
+            /* Primary accent */
+            --violet-mid: #4ba05b;
+            /* Mid — gradients */
+            --violet-pale: #4ba05b;
+            /* Text on dark — readable */
+            --violet-glow: #fff;
+            /* Ambient glow */
 
-            --radius-sm:     4px;
-            --radius-md:     8px;
-            --radius-lg:     16px;
+            /* Text */
+            --chalk: #f0eef8;
+            /* Primary text — cool white */
+            --chalk-2: #a09dba;
+            /* Secondary — muted */
+            --chalk-3: #5c5975;
+            /* Tertiary — very muted */
 
-            --shadow-card:   0 2px 8px rgba(0,0,0,.45);
-            --shadow-modal:  0 24px 64px rgba(0,0,0,.7);
+            /* Type */
+            --font-display: 'Cormorant Garamond', Georgia, serif;
+            --font-body: 'DM Sans', system-ui, sans-serif;
 
-            --transition:    150ms ease;
-            --grid-gap:      12px;
+            /* Spacing */
+            --gap: clamp(48px, 8vw, 120px);
+            --radius: 2px;
+            /* Almost no radius — sharp, editorial */
         }
 
-        /* ==================================================================
-           RESET & BASE
-        ================================================================== */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        /* ====================================================================
+           RESET
+        ==================================================================== */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-        html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+        }
 
         body {
-            font-family:      var(--font-ui);
-            background-color: var(--c-bg);
-            color:            var(--c-text);
-            min-height:       100vh;
+            font-family: var(--font-body);
+            background-color: var(--ink);
+            color: var(--chalk);
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
-        a { color: inherit; text-decoration: none; }
+        img {
+            display: block;
+            max-width: 100%;
+        }
 
-        img, video { display: block; max-width: 100%; }
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
 
         button {
-            font-family: var(--font-ui);
-            cursor:      pointer;
-            border:      none;
-            outline:     none;
+            font-family: var(--font-body);
+            cursor: pointer;
+            border: none;
+            background: none;
         }
 
-        input, select, textarea {
-            font-family: var(--font-ui);
-            outline: none;
-        }
-
-        /* ==================================================================
-           UTILITY CLASSES
-        ================================================================== */
-        .visually-hidden {
-            position: absolute;
-            width: 1px; height: 1px;
-            overflow: hidden;
-            clip: rect(0 0 0 0);
-            white-space: nowrap;
-        }
-
-        .btn {
-            display:         inline-flex;
-            align-items:     center;
-            gap:             8px;
-            padding:         10px 20px;
-            border-radius:   var(--radius-sm);
-            font-size:       0.875rem;
-            font-weight:     600;
-            letter-spacing:  0.02em;
-            transition:      background var(--transition), transform var(--transition);
-        }
-        .btn:active { transform: translateY(1px); }
-
-        .btn-primary {
-            background: var(--c-accent);
-            color:      #0f0f0f;
-        }
-        .btn-primary:hover { background: var(--c-accent-dark); }
-
-        .btn-ghost {
-            background: transparent;
-            color:      var(--c-text-muted);
-            border:     1px solid var(--c-border);
-        }
-        .btn-ghost:hover { color: var(--c-text); border-color: var(--c-text-muted); }
-
-        /* ==================================================================
+        /* ====================================================================
            NAVIGATION
-        ================================================================== */
+        ==================================================================== */
         .nav {
-            position:        sticky;
-            top:             0;
-            z-index:         100;
-            display:         flex;
-            align-items:     center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
             justify-content: space-between;
-            padding:         0 24px;
-            height:          60px;
-            background:      rgba(15,15,15,.88);
-            backdrop-filter: blur(12px);
-            border-bottom:   1px solid var(--c-border);
+            padding: 0 clamp(24px, 5vw, 64px);
+            height: 72px;
+            background: linear-gradient(to bottom, rgba(9, 9, 15, .95), transparent);
+            backdrop-filter: blur(0px);
+            transition: backdrop-filter 400ms ease, background 400ms ease;
+        }
+
+        .nav.scrolled {
+            background: rgba(9, 9, 15, .92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
         }
 
         .nav__logo {
             font-family: var(--font-display);
-            font-size:   1.35rem;
-            color:       var(--c-accent);
-            letter-spacing: -0.01em;
+            font-size: 1.5rem;
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            color: var(--chalk);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .nav__logo span { color: var(--c-text); }
+        .nav__logo em {
+            font-style: italic;
+            color: var(--violet-pale);
+        }
 
         .nav__links {
-            display:     flex;
+            display: flex;
             align-items: center;
-            gap:         8px;
+            gap: 32px;
         }
 
-        /* Auth state: these containers are toggled by JS */
-        #nav-auth-signed-out,
-        #nav-auth-signed-in   { display: flex; align-items: center; gap: 8px; }
-
-        #nav-user-email {
-            font-size:  0.8rem;
-            color:      var(--c-text-muted);
-            max-width:  180px;
-            overflow:   hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* ==================================================================
-           HERO / SEARCH BAR
-        ================================================================== */
-        .hero {
-            padding:    64px 24px 48px;
-            text-align: center;
-        }
-
-        .hero__eyebrow {
-            font-size:      0.75rem;
-            font-weight:    600;
-            letter-spacing: 0.15em;
+        .nav__link {
+            font-size: 0.78rem;
+            font-weight: 400;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
-            color:          var(--c-accent);
-            margin-bottom:  12px;
+            color: var(--chalk-2);
+            transition: color 200ms ease;
         }
 
-        .hero__title {
-            font-family:    var(--font-display);
-            font-size:      clamp(2rem, 5vw, 3.5rem);
-            line-height:    1.1;
-            color:          var(--c-text);
-            margin-bottom:  24px;
+        .nav__link:hover {
+            color: var(--chalk);
         }
 
-        .hero__title em {
-            font-style: normal;
-            color:      var(--c-accent);
-        }
-
-        /* Search form */
-        .search-form {
-            display:      flex;
-            max-width:    620px;
-            margin:       0 auto;
-            gap:          0;
-            border:       1px solid var(--c-border);
-            border-radius: var(--radius-sm);
-            overflow:     hidden;
-            background:   var(--c-surface);
-            transition:   border-color var(--transition);
-        }
-        .search-form:focus-within { border-color: var(--c-accent); }
-
-        #search-input {
-            flex:         1;
-            padding:      14px 18px;
-            background:   transparent;
-            border:       none;
-            color:        var(--c-text);
-            font-size:    0.95rem;
-        }
-        #search-input::placeholder { color: var(--c-text-muted); }
-
-        #search-btn {
-            padding:    0 22px;
-            background: var(--c-accent);
-            color:      #0f0f0f;
-            font-size:  0.875rem;
-            font-weight: 600;
-        }
-        #search-btn:hover { background: var(--c-accent-dark); }
-
-        /* ==================================================================
-           TAG FILTER BAR
-        ================================================================== */
-        .tag-bar {
-            display:    flex;
-            gap:        8px;
-            padding:    0 24px 32px;
-            overflow-x: auto;
-            /* Hide scrollbar visually but keep it functional */
-            scrollbar-width: none;
-        }
-        .tag-bar::-webkit-scrollbar { display: none; }
-
-        .tag-pill {
-            flex-shrink:   0;
-            padding:       6px 14px;
-            border-radius: 999px;
-            font-size:     0.78rem;
-            font-weight:   500;
-            background:    var(--c-surface);
-            color:         var(--c-text-muted);
-            border:        1px solid var(--c-border);
-            cursor:        pointer;
-            transition:    background var(--transition), color var(--transition),
-                           border-color var(--transition);
-            white-space:   nowrap;
-        }
-        .tag-pill:hover,
-        .tag-pill.is-active {
-            background:   var(--c-accent);
-            color:        #0f0f0f;
-            border-color: var(--c-accent);
-        }
-
-        /* ==================================================================
-           MASONRY GRID
-           CSS column-count masonry — no JS library needed.
-           The card absolute-position trick in JS fills columns top-to-bottom
-           which is exactly how Shutterstock's grid works.
-        ================================================================== */
-        .grid-container {
-            padding: 0 24px 48px;
-        }
-
-        /* Status messages shown before / during / after grid load */
-        .grid-status {
-            text-align:  center;
-            padding:     64px 24px;
-            color:       var(--c-text-muted);
-            font-size:   0.95rem;
-        }
-
-        /* The masonry grid itself */
-        #masonry-grid {
-            columns:     4 280px;   /* Auto-fit columns of minimum 280px */
-            gap:         var(--grid-gap);
-        }
-
-        /* ==================================================================
-           ASSET CARD
-        ================================================================== */
-        .asset-card {
-            break-inside:  avoid;           /* Keeps card in one column */
-            margin-bottom: var(--grid-gap);
-            border-radius: var(--radius-md);
-            overflow:      hidden;
-            background:    var(--c-surface);
-            box-shadow:    var(--shadow-card);
-            cursor:        pointer;
-            position:      relative;
-            /* Hardware-accelerated hover lift */
-            transition:    transform 200ms ease, box-shadow 200ms ease;
-        }
-        .asset-card:hover {
-            transform:  translateY(-3px);
-            box-shadow: 0 8px 24px rgba(0,0,0,.6);
-        }
-
-        .asset-card__thumb {
-            width:  100%;
-            height: auto;
-            /* Skeleton shimmer while image loads */
-            background: linear-gradient(90deg, var(--c-surface) 25%, var(--c-surface-2) 50%, var(--c-surface) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.4s infinite;
-            display: block;
-        }
-        .asset-card__thumb.loaded { animation: none; background: none; }
-
-        @keyframes shimmer {
-            0%   { background-position:  200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        /* Overlay shown on hover */
-        .asset-card__overlay {
-            position:   absolute;
-            inset:      0;
-            background: linear-gradient(to top, rgba(0,0,0,.75) 0%, transparent 55%);
-            opacity:    0;
-            transition: opacity 200ms ease;
-            display:    flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding:    14px;
-        }
-        .asset-card:hover .asset-card__overlay { opacity: 1; }
-
-        .asset-card__title {
-            font-size:   0.82rem;
-            font-weight: 600;
-            color:       #fff;
-            line-height: 1.3;
-            margin-bottom: 4px;
-            /* Truncate to 2 lines */
-            display:            -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow:           hidden;
-        }
-
-        .asset-card__meta {
-            display:     flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .asset-card__photographer {
-            font-size:  0.72rem;
-            color:      rgba(255,255,255,.7);
-        }
-
-        .asset-card__price {
-            font-size:   0.78rem;
-            font-weight: 700;
-            color:       var(--c-accent);
-        }
-
-        /* Video badge — shown on video asset cards */
-        .asset-card__badge {
-            position:      absolute;
-            top:           10px;
-            right:         10px;
-            background:    rgba(0,0,0,.65);
-            color:         #fff;
-            font-size:     0.65rem;
-            font-weight:   700;
-            letter-spacing: 0.08em;
-            padding:       3px 7px;
-            border-radius: var(--radius-sm);
-            text-transform: uppercase;
-            backdrop-filter: blur(4px);
-        }
-
-        /* ==================================================================
-           MODAL — Image Detail View
-        ================================================================== */
-        .modal-backdrop {
-            position:   fixed;
-            inset:      0;
-            z-index:    200;
-            background: rgba(0,0,0,.85);
-            display:    flex;
-            align-items: center;
-            justify-content: center;
-            padding:    24px;
-            opacity:    0;
-            pointer-events: none;
-            transition: opacity 200ms ease;
-        }
-        .modal-backdrop.is-open {
-            opacity:        1;
-            pointer-events: all;
-        }
-
-        .modal {
-            background:    var(--c-surface);
-            border-radius: var(--radius-lg);
-            box-shadow:    var(--shadow-modal);
-            width:         100%;
-            max-width:     960px;
-            max-height:    90vh;
-            overflow-y:    auto;
-            display:       grid;
-            grid-template-columns: 1fr 340px;
-        }
-
-        @media (max-width: 680px) {
-            .modal { grid-template-columns: 1fr; }
-        }
-
-        .modal__preview {
-            position:   relative;
-            background: #000;
-            border-radius: var(--radius-lg) 0 0 var(--radius-lg);
-            overflow:   hidden;
-            min-height: 300px;
-            display:    flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #modal-preview-img {
-            width:      100%;
-            height:     100%;
-            object-fit: contain;
-        }
-
-        /* Watermark overlay — CSS-only, no canvas needed for this preview */
-        .modal__watermark {
-            position:       absolute;
-            inset:          0;
-            display:        flex;
-            align-items:    center;
-            justify-content: center;
-            pointer-events: none;
-            /* Diagonal repeating watermark text */
-            background-image: repeating-linear-gradient(
-                -45deg,
-                transparent,
-                transparent 60px,
-                rgba(255,255,255,.03) 60px,
-                rgba(255,255,255,.03) 61px
-            );
-        }
-
-        .modal__watermark-text {
-            font-family:    var(--font-display);
-            font-size:      clamp(1.2rem, 4vw, 2.2rem);
-            font-weight:    700;
-            color:          rgba(255,255,255,.18);
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            transform:      rotate(-30deg);
-            user-select:    none;
-            white-space:    nowrap;
-        }
-
-        .modal__info {
-            padding:        32px 28px;
-            display:        flex;
-            flex-direction: column;
-            gap:            20px;
-            overflow-y:     auto;
-        }
-
-        .modal__close {
-            align-self:  flex-end;
-            background:  var(--c-surface-2);
-            color:       var(--c-text-muted);
-            border:      1px solid var(--c-border);
-            border-radius: var(--radius-sm);
-            padding:     6px 12px;
-            font-size:   0.8rem;
-        }
-        .modal__close:hover { color: var(--c-text); }
-
-        #modal-title {
-            font-family:  var(--font-display);
-            font-size:    1.4rem;
-            line-height:  1.25;
-            color:        var(--c-text);
-        }
-
-        .modal__photographer {
-            font-size:   0.82rem;
-            color:       var(--c-text-muted);
-        }
-        .modal__photographer strong { color: var(--c-accent); }
-
-        .modal__tags {
-            display:  flex;
-            flex-wrap: wrap;
-            gap:      6px;
-        }
-
-        .modal__tag {
-            font-size:     0.72rem;
-            padding:       4px 10px;
-            background:    var(--c-surface-2);
-            border:        1px solid var(--c-border);
-            border-radius: 999px;
-            color:         var(--c-text-muted);
-            cursor:        pointer;
-        }
-        .modal__tag:hover { color: var(--c-text); border-color: var(--c-text-muted); }
-
-        /* Spec table — camera, dimensions, file size */
-        .modal__specs {
-            display:  grid;
-            grid-template-columns: 1fr 1fr;
-            gap:      10px 16px;
-            font-size: 0.8rem;
-        }
-
-        .modal__spec-item {
-            display:        flex;
-            flex-direction: column;
-            gap:            2px;
-        }
-
-        .modal__spec-label {
-            font-size:      0.68rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color:          var(--c-text-muted);
-        }
-
-        .modal__spec-value {
-            color:       var(--c-text);
+        .nav__cta {
+            padding: 10px 22px;
+            border: 1px solid var(--violet);
+            color: var(--violet-pale);
+            font-size: 0.78rem;
             font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: background 200ms ease, color 200ms ease;
         }
 
-        .modal__divider {
-            border: none;
-            border-top: 1px solid var(--c-border);
+        .nav__cta:hover {
+            background: var(--violet);
+            color: #fff;
         }
 
-        /* Price and buy section */
-        .modal__price-row {
-            display:     flex;
-            align-items: baseline;
-            gap:         8px;
-        }
-
-        #modal-price {
-            font-family:  var(--font-display);
-            font-size:    2rem;
-            color:        var(--c-accent);
-        }
-
-        .modal__license-label {
-            font-size:  0.78rem;
-            color:      var(--c-text-muted);
-        }
-
-        #modal-buy-btn {
-            width:         100%;
-            padding:       14px;
-            border-radius: var(--radius-md);
-            font-size:     0.95rem;
-            text-align:    center;
-            justify-content: center;
-        }
-
-        /* ==================================================================
-           AUTH MODAL
-        ================================================================== */
-        .auth-modal-backdrop {
-            position:   fixed;
-            inset:      0;
-            z-index:    300;
-            background: rgba(0,0,0,.85);
-            display:    flex;
-            align-items: center;
-            justify-content: center;
-            padding:    24px;
-            opacity:    0;
-            pointer-events: none;
-            transition: opacity 200ms ease;
-        }
-        .auth-modal-backdrop.is-open {
-            opacity:        1;
-            pointer-events: all;
-        }
-
-        .auth-modal {
-            background:    var(--c-surface);
-            border-radius: var(--radius-lg);
-            padding:       40px;
-            width:         100%;
-            max-width:     420px;
-            box-shadow:    var(--shadow-modal);
-        }
-
-        .auth-modal__title {
-            font-family:   var(--font-display);
-            font-size:     1.6rem;
-            margin-bottom: 8px;
-        }
-
-        .auth-modal__subtitle {
-            font-size:     0.85rem;
-            color:         var(--c-text-muted);
-            margin-bottom: 28px;
-        }
-
-        .auth-modal__subtitle a {
-            color: var(--c-accent);
+        .nav__hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
             cursor: pointer;
         }
 
-        .form-group {
-            display:       flex;
+        .nav__hamburger span {
+            display: block;
+            width: 24px;
+            height: 1px;
+            background: var(--chalk);
+            transition: all 200ms;
+        }
+
+        /* ====================================================================
+           HERO — Cinematic full-bleed with diagonal image split
+           Signature element: the giant italic serif overlapping a photo crop
+        ==================================================================== */
+        .hero {
+            position: relative;
+            height: 100svh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+        }
+
+        /* Left: text panel */
+        .hero__text {
+            position: relative;
+            z-index: 2;
+            display: flex;
             flex-direction: column;
-            gap:           6px;
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            font-size:      0.78rem;
-            font-weight:    600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color:          var(--c-text-muted);
-        }
-
-        .form-group input,
-        .form-group select {
-            padding:       12px 14px;
-            border-radius: var(--radius-sm);
-            background:    var(--c-bg);
-            border:        1px solid var(--c-border);
-            color:         var(--c-text);
-            font-size:     0.9rem;
-            transition:    border-color var(--transition);
-        }
-        .form-group input:focus,
-        .form-group select:focus { border-color: var(--c-accent); }
-
-        .form-group select option { background: var(--c-surface); }
-
-        .auth-modal__submit {
-            width:         100%;
-            margin-top:    8px;
-            padding:       14px;
-            border-radius: var(--radius-md);
-            font-size:     0.95rem;
             justify-content: center;
+            padding: 120px clamp(24px, 5vw, 80px) 80px;
         }
 
-        .auth-error {
-            font-size:     0.82rem;
-            color:         #e07070;
-            margin-top:    10px;
-            text-align:    center;
-            min-height:    20px;
+        .hero__eyebrow {
+            font-size: 0.68rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--violet-pale);
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        /* ==================================================================
-           TOAST NOTIFICATIONS
-        ================================================================== */
-        #toast-container {
-            position:   fixed;
-            bottom:     24px;
-            right:      24px;
-            z-index:    500;
-            display:    flex;
+        .hero__eyebrow::before {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 1px;
+            background: var(--violet);
+        }
+
+        .hero__title {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 6vw, 5.5rem);
+            font-weight: 300;
+            line-height: 1.0;
+            color: var(--chalk);
+            margin-bottom: 32px;
+        }
+
+        .hero__title em {
+            font-style: italic;
+            color: var(--violet-pale);
+            display: block;
+        }
+
+        .hero__sub {
+            font-size: clamp(0.88rem, 1.2vw, 1rem);
+            font-weight: 300;
+            line-height: 1.7;
+            color: var(--chalk-2);
+            max-width: 420px;
+            margin-bottom: 48px;
+        }
+
+        .hero__actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            padding: 14px 36px;
+            background: var(--violet);
+            color: #fff;
+            font-size: 0.82rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: background 200ms ease, transform 150ms ease;
+        }
+
+        .btn-primary:hover {
+            background: #3f9549;
+            transform: translateY(-1px);
+        }
+
+        .btn-ghost {
+            padding: 14px 36px;
+            border: 1px solid var(--border-lit);
+            color: var(--chalk-2);
+            font-size: 0.82rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: border-color 200ms ease, color 200ms ease;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--chalk-2);
+            color: var(--chalk);
+        }
+
+        /* Hero stats strip */
+        .hero__stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 64px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        .hero__stat-num {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--chalk);
+            line-height: 1;
+        }
+
+        .hero__stat-label {
+            font-size: 0.72rem;
+            color: var(--chalk-3);
+            margin-top: 4px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        /* Right: image panel */
+        .hero__image-panel {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        /* Diagonal clip — the signature visual */
+        .hero__image-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(9, 9, 15, .98) 0%, rgba(9, 9, 15, .92) 42%, rgba(9, 9, 15, .42) 68%, rgba(9, 9, 15, .15) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .hero__image-panel::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom,
+                    rgba(9, 9, 15, .5) 0%,
+                    transparent 40%,
+                    rgba(9, 9, 15, .7) 100%);
+            z-index: 1;
+        }
+
+        /* Full-height wildlife photo slideshow */
+        .hero__slideshow {
+            position: absolute;
+            inset: 0;
+        }
+
+        .hero__slide {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            opacity: 0;
+            transition: opacity 900ms ease-in-out, transform 4s ease-out;
+            transform: scale(1.04);
+        }
+
+        .hero__slide.is-active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* The oversized italic word that bleeds across both panels — the signature */
+        .hero__bleed-word {
+            position: absolute;
+            bottom: 60px;
+            right: -20px;
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 300;
+            font-size: clamp(5rem, 12vw, 11rem);
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(168, 85, 247, 0.25);
+            letter-spacing: -0.02em;
+            line-height: 1;
+            pointer-events: none;
+            z-index: 3;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        /* ====================================================================
+           MARQUEE STRIP
+        ==================================================================== */
+        .marquee-strip {
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            overflow: hidden;
+            background: var(--ink-2);
+        }
+
+        .marquee-track {
+            display: flex;
+            gap: 48px;
+            animation: marquee 28s linear infinite;
+            width: max-content;
+        }
+
+        .marquee-item {
+            font-size: 0.68rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--chalk-3);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 48px;
+        }
+
+        .marquee-item::after {
+            content: '◆';
+            font-size: 0.45rem;
+            color: var(--violet);
+        }
+
+        @keyframes marquee {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* ====================================================================
+           SECTION COMMON
+        ==================================================================== */
+        .section {
+            padding: var(--gap) clamp(24px, 5vw, 80px);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--violet-pale);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-label::before {
+            content: '';
+            display: block;
+            width: 32px;
+            height: 1px;
+            background: var(--violet);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 300;
+            line-height: 1.1;
+            color: var(--chalk);
+            margin-bottom: 20px;
+        }
+
+        .section-title em {
+            font-style: italic;
+            color: var(--violet-pale);
+        }
+
+        .section-sub {
+            font-size: 0.9rem;
+            font-weight: 300;
+            line-height: 1.7;
+            color: var(--chalk-2);
+            max-width: 520px;
+        }
+
+        /* ====================================================================
+           COLLECTIONS — 3 editorial cards in asymmetric layout
+        ==================================================================== */
+        .collections {
+            padding: var(--gap) clamp(24px, 5vw, 80px);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .collections__header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 48px;
+            gap: 24px;
+        }
+
+        .collections__grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr;
+            grid-template-rows: 380px 240px;
+            gap: 4px;
+        }
+
+        .col-card {
+            position: relative;
+            overflow: hidden;
+            background: var(--ink-3);
+            cursor: pointer;
+        }
+
+        /* Span first card across both rows */
+        .col-card:first-child {
+            grid-row: 1 / 3;
+        }
+
+        /* Real photography for the collections */
+        .col-card {
+            background-position: center;
+            background-size: cover;
+            transition: background-size 400ms ease;
+        }
+
+        .col-card:hover {
+            background-size: 108%;
+        }
+
+        .col-card:nth-child(1) {
+            background-image: url('https://images.unsplash.com/photo-1549366021-9f761d450615?auto=format&fit=crop&w=1400&q=85');
+        }
+
+        .col-card:nth-child(2) {
+            background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=85');
+        }
+
+        .col-card:nth-child(3) {
+            background-image: url('https://images.unsplash.com/photo-1544550285-f813152fb2fd?auto=format&fit=crop&w=1200&q=85');
+        }
+
+        .col-card:nth-child(4) {
+            background-image: url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=85');
+        }
+
+        .col-card:nth-child(5) {
+            background-image: url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=85');
+        }
+
+        .col-card__overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(9, 9, 15, .85) 0%, transparent 55%);
+            opacity: 0;
+            transition: opacity 300ms ease;
+            display: flex;
             flex-direction: column;
-            gap:        10px;
+            justify-content: flex-end;
+            padding: 24px;
         }
 
-        .toast {
-            padding:       12px 18px;
-            border-radius: var(--radius-md);
-            font-size:     0.875rem;
-            font-weight:   500;
-            background:    var(--c-surface-2);
-            border:        1px solid var(--c-border);
-            color:         var(--c-text);
-            box-shadow:    var(--shadow-card);
-            animation:     toast-in 250ms ease forwards;
-            max-width:     320px;
-        }
-        .toast.success { border-color: #5a9e6f; }
-        .toast.error   { border-color: #9e5a5a; }
-
-        @keyframes toast-in {
-            from { opacity: 0; transform: translateY(12px); }
-            to   { opacity: 1; transform: translateY(0); }
+        .col-card:hover .col-card__overlay {
+            opacity: 1;
         }
 
-        /* ==================================================================
-           LOAD MORE BUTTON
-        ================================================================== */
-        .load-more-wrap {
+        /* Violet corner accent — appears on hover */
+        .col-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 0;
+            background: var(--violet);
+            transition: height 300ms ease;
+        }
+
+        .col-card:hover::after {
+            height: 100%;
+        }
+
+        .col-card__tag {
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--violet-pale);
+            margin-bottom: 6px;
+        }
+
+        .col-card__title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: var(--chalk);
+        }
+
+        .col-card__count {
+            font-size: 0.72rem;
+            color: var(--chalk-3);
+            margin-top: 4px;
+        }
+
+        /* ====================================================================
+           HOW IT WORKS — horizontal process strip
+        ==================================================================== */
+        .process {
+            padding: var(--gap) clamp(24px, 5vw, 80px);
+            background: var(--ink-2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .process__inner {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .process__steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            margin-top: 56px;
+            background: var(--border);
+        }
+
+        .process__step {
+            background: var(--ink-2);
+            padding: 40px 36px;
+            position: relative;
+        }
+
+        .process__step-num {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 300;
+            color: var(--border-lit);
+            line-height: 1;
+            margin-bottom: 20px;
+            transition: color 300ms ease;
+        }
+
+        .process__step:hover .process__step-num {
+            color: var(--violet-glow);
+        }
+
+        .process__step-title {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: var(--chalk);
+            margin-bottom: 12px;
+        }
+
+        .process__step-body {
+            font-size: 0.85rem;
+            font-weight: 300;
+            line-height: 1.7;
+            color: var(--chalk-2);
+        }
+
+        /* Violet bottom border on hover */
+        .process__step::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--violet);
+            transition: width 350ms ease;
+        }
+
+        .process__step:hover::after {
+            width: 100%;
+        }
+
+        /* ====================================================================
+           FEATURED ASSET — full-bleed editorial spotlight
+        ==================================================================== */
+        .featured {
+            padding: var(--gap) clamp(24px, 5vw, 80px);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .featured__inner {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 4px;
+            min-height: 520px;
+        }
+
+        .featured__image {
+            background: linear-gradient(145deg, #0d0d1f 0%, #1a0f35 30%, #2d1b50 55%, #110a2d 80%, #0a0a14 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .featured__image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 70% 50%, rgba(124, 58, 237, .12) 0%, transparent 65%);
+        }
+
+        .featured__info {
+            background: var(--ink-3);
+            padding: 48px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-left: 1px solid var(--border);
+        }
+
+        .featured__category {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--violet-pale);
+        }
+
+        .featured__title {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 300;
+            line-height: 1.15;
+            color: var(--chalk);
+            margin: 16px 0;
+        }
+
+        .featured__title em {
+            font-style: italic;
+        }
+
+        .featured__meta {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .featured__meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--chalk-3);
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .featured__meta-row span:last-child {
+            color: var(--chalk-2);
+        }
+
+        .featured__price {
+            font-family: var(--font-display);
+            font-size: 2.8rem;
+            font-weight: 300;
+            color: var(--chalk);
+        }
+
+        .featured__price sup {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            vertical-align: super;
+            color: var(--chalk-2);
+        }
+
+        .featured__cta {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-violet {
+            padding: 14px 24px;
+            background: var(--violet);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
             text-align: center;
-            padding:    8px 24px 64px;
+            transition: background 200ms ease;
+            display: block;
         }
 
-        #load-more-btn {
-            padding: 12px 40px;
+        .btn-violet:hover {
+            background: #6d28d9;
         }
 
-        /* ==================================================================
+        .btn-outline-sm {
+            padding: 14px 24px;
+            border: 1px solid var(--border-lit);
+            color: var(--chalk-2);
+            font-size: 0.78rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-align: center;
+            transition: border-color 200ms ease, color 200ms ease;
+            display: block;
+        }
+
+        .btn-outline-sm:hover {
+            border-color: var(--chalk-3);
+            color: var(--chalk);
+        }
+
+        /* ====================================================================
+           TESTIMONIAL / TRUST
+        ==================================================================== */
+        .trust {
+            padding: var(--gap) clamp(24px, 5vw, 80px);
+            background: var(--ink-2);
+            border-top: 1px solid var(--border);
+        }
+
+        .trust__inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .trust__quote {
+            font-family: var(--font-display);
+            font-size: clamp(1.4rem, 2.5vw, 2rem);
+            font-weight: 300;
+            font-style: italic;
+            line-height: 1.4;
+            color: var(--chalk);
+        }
+
+        .trust__quote::before {
+            content: open-quote;
+            color: var(--violet);
+            font-size: 3rem;
+            line-height: 0;
+            vertical-align: -0.5rem;
+            margin-right: 4px;
+        }
+
+        .trust__author {
+            margin-top: 24px;
+            font-size: 0.78rem;
+            color: var(--chalk-3);
+            letter-spacing: 0.08em;
+        }
+
+        .trust__author strong {
+            color: var(--chalk-2);
+        }
+
+        .trust__numbers {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .trust__number-item {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .trust__number-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .trust__big-num {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 300;
+            color: var(--chalk);
+            line-height: 1;
+        }
+
+        .trust__num-label {
+            font-size: 0.8rem;
+            font-weight: 300;
+            color: var(--chalk-2);
+            line-height: 1.5;
+        }
+
+        /* ====================================================================
+           CTA BANNER
+        ==================================================================== */
+        .cta-banner {
+            padding: var(--gap) clamp(24px, 5vw, 80px);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .cta-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 50%, rgba(124, 58, 237, .15) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .cta-banner__inner {
+            max-width: 680px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-banner__title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 300;
+            line-height: 1.1;
+            color: var(--chalk);
+            margin-bottom: 20px;
+        }
+
+        .cta-banner__title em {
+            font-style: italic;
+            color: var(--violet-pale);
+        }
+
+        .cta-banner__sub {
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: var(--chalk-2);
+            line-height: 1.7;
+            margin-bottom: 40px;
+        }
+
+        .cta-banner__actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ====================================================================
+           ABOUT & CONTACT
+        ==================================================================== */
+        .about-contact {
+            padding: var(--gap) clamp(24px, 5vw, 80px);
+            background: var(--ink-2);
+            border-top: 1px solid var(--border);
+        }
+
+        .about-contact__grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(40px, 8vw, 140px);
+        }
+
+        #about,
+        #contact {
+            scroll-margin-top: 100px;
+        }
+
+        .about-contact__body {
+            max-width: 520px;
+            color: var(--chalk-2);
+            font-size: 0.95rem;
+            font-weight: 300;
+            line-height: 1.8;
+            margin-top: 24px;
+        }
+
+        .contact-link {
+            display: inline-block;
+            margin-top: 28px;
+            color: var(--violet-pale);
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+            font-weight: 300;
+            border-bottom: 1px solid var(--violet);
+            transition: color 200ms ease, border-color 200ms ease;
+        }
+
+        .contact-link:hover {
+            color: var(--chalk);
+            border-color: var(--chalk);
+        }
+
+        /* ====================================================================
            FOOTER
-        ================================================================== */
+        ==================================================================== */
         .footer {
-            border-top:  1px solid var(--c-border);
-            padding:     32px 24px;
-            text-align:  center;
-            font-size:   0.78rem;
-            color:       var(--c-text-muted);
+            border-top: 1px solid var(--border);
+            padding: 48px clamp(24px, 5vw, 80px);
+            background: var(--ink);
         }
 
-        /* ==================================================================
-           RESPONSIVE TWEAKS
-        ================================================================== */
+        .footer__inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .footer__logo {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: var(--chalk-3);
+        }
+
+        .footer__logo em {
+            font-style: italic;
+            color: var(--violet-pale);
+        }
+
+        .footer__links {
+            display: flex;
+            gap: 32px;
+        }
+
+        .footer__link {
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--chalk-3);
+            transition: color 200ms ease;
+        }
+
+        .footer__link:hover {
+            color: var(--chalk-2);
+        }
+
+        .footer__copy {
+            font-size: 0.72rem;
+            color: var(--chalk-3);
+        }
+
+        /* ====================================================================
+           SCROLL REVEAL — subtle fade-up on section entry
+        ==================================================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 700ms ease, transform 700ms ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 {
+            transition-delay: 100ms;
+        }
+
+        .reveal-delay-2 {
+            transition-delay: 200ms;
+        }
+
+        .reveal-delay-3 {
+            transition-delay: 320ms;
+        }
+
+        /* ====================================================================
+           RESPONSIVE
+        ==================================================================== */
         @media (max-width: 900px) {
-            #masonry-grid { columns: 3 220px; }
-        }
-        @media (max-width: 600px) {
-            .hero { padding: 40px 16px 32px; }
-            .grid-container { padding: 0 12px 32px; }
-            #masonry-grid { columns: 2 150px; gap: 8px; }
-            .tag-bar { padding: 0 12px 24px; }
-            .modal { grid-template-columns: 1fr; }
-            .modal__preview { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+            .hero {
+                height: auto;
+                min-height: 100svh;
+            }
+
+            .hero__image-panel {
+                height: auto;
+            }
+
+            .hero__bleed-word {
+                font-size: 4rem;
+                bottom: 20px;
+            }
+
+            .collections__grid {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto;
+            }
+
+            .col-card:first-child {
+                grid-row: auto;
+            }
+
+            .col-card {
+                min-height: 220px;
+            }
+
+            .process__steps {
+                grid-template-columns: 1fr;
+            }
+
+            .featured__inner {
+                grid-template-columns: 1fr;
+            }
+
+            .trust__inner {
+                grid-template-columns: 1fr;
+                gap: 48px;
+            }
+
+            .about-contact__grid {
+                grid-template-columns: 1fr;
+                gap: 56px;
+            }
+
+            .nav__links {
+                display: none;
+            }
+
+            .nav__hamburger {
+                display: flex;
+            }
         }
 
-        /* Respect user's motion preference */
+        @media (max-width: 600px) {
+            .hero__stats {
+                gap: 24px;
+                flex-wrap: wrap;
+            }
+
+            .collections__grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-height: 800px) and (min-width: 901px) {
+            .hero__text {
+                padding-top: 96px;
+                padding-bottom: 40px;
+            }
+
+            .hero__eyebrow {
+                margin-bottom: 18px;
+            }
+
+            .hero__title {
+                font-size: clamp(3rem, 5vw, 4.3rem);
+                margin-bottom: 20px;
+            }
+
+            .hero__sub {
+                margin-bottom: 28px;
+            }
+        }
+
         @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+
+            .reveal {
+                opacity: 1;
+                transform: none;
+            }
         }
     </style>
 </head>
+
 <body>
 
-    <!-- ====================================================================
-         NAVIGATION
-    ===================================================================== -->
-    <nav class="nav" role="navigation" aria-label="Main navigation">
-        <a href="/" class="nav__logo">Pixel<span>Vault</span></a>
-
+    <!-- =====================================================================
+     NAVIGATION
+====================================================================== -->
+    <nav class="nav" id="main-nav">
+        <a href="/" class="nav__logo">
+            <img src="natbioslogog.png" alt="Natbios" height="32" style="vertical-align:middle;" />
+            <span> Stock</span>
+        </a>
         <div class="nav__links">
-            <!-- Shown when the user is NOT logged in -->
-            <div id="nav-auth-signed-out">
-                <button class="btn btn-ghost" id="btn-open-login">Log in</button>
-                <button class="btn btn-primary" id="btn-open-signup">Sign up</button>
-            </div>
-
-            <!-- Shown when the user IS logged in (hidden by default) -->
-            <div id="nav-auth-signed-in" style="display:none">
-                <span id="nav-user-email"></span>
-                <a href="dashboard.html" class="btn btn-ghost">Dashboard</a>
-                <button class="btn btn-ghost" id="btn-logout">Log out</button>
-            </div>
+            <a href="#collections" class="nav__link">Collections</a>
+            <a href="#how-it-works" class="nav__link">Licensing</a>
+            <a href="#" class="nav__link">Photographers</a>
+            <a href="#about" class="nav__link">About</a>
+            <a href="#contact" class="nav__link">Contact</a>
+            <a href="gallery.html" class="nav__cta">Browse Library</a>
+        </div>
+        <div class="nav__hamburger" id="hamburger" aria-label="Open menu">
+            <span></span><span></span><span></span>
         </div>
     </nav>
 
-    <!-- ====================================================================
-         HERO + SEARCH
-    ===================================================================== -->
-    <header class="hero" role="banner">
-        <p class="hero__eyebrow">Over 50,000 licensed works</p>
-        <h1 class="hero__title">
-            Stock photos &amp; video<br />
-            <em>worth licensing.</em>
-        </h1>
+    <!-- =====================================================================
+     HERO
+====================================================================== -->
+    <section class="hero" aria-label="Hero">
+        <!-- Left: copy -->
+        <div class="hero__text">
+            <p class="hero__eyebrow">Nature · Wildlife · 4K Video</p>
 
-        <form class="search-form" id="search-form" role="search">
-            <label for="search-input" class="visually-hidden">Search photos and videos</label>
-            <input
-                id="search-input"
-                type="search"
-                placeholder="Search landscapes, portraits, 4K video…"
-                autocomplete="off"
-                spellcheck="false"
-            />
-            <button type="submit" id="search-btn" aria-label="Run search">Search</button>
-        </form>
-    </header>
+            <h1 class="hero__title">
+                License world&#8209;class
+                <em>nature & wildlife</em>
+                for your work.
+            </h1>
 
-    <!-- ====================================================================
-         TAG FILTER BAR
-         Populated dynamically from the `tags` table in app.js
-    ===================================================================== -->
-    <div class="tag-bar" id="tag-bar" role="list" aria-label="Filter by category">
-        <!-- JS fills these in -->
-    </div>
-
-    <!-- ====================================================================
-         MASONRY GRID
-    ===================================================================== -->
-    <main class="grid-container" id="grid-container">
-        <!-- Loading skeleton shown while the first fetch runs -->
-        <p class="grid-status" id="grid-status" aria-live="polite">
-            Loading assets…
-        </p>
-        <div id="masonry-grid" aria-label="Photo and video grid"></div>
-    </main>
-
-    <!-- Load More button (hidden until first page loads) -->
-    <div class="load-more-wrap" id="load-more-wrap" style="display:none">
-        <button class="btn btn-ghost" id="load-more-btn">Load more</button>
-    </div>
-
-    <!-- ====================================================================
-         IMAGE / VIDEO DETAIL MODAL
-    ===================================================================== -->
-    <div class="modal-backdrop" id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div class="modal">
-            <!-- Left: watermarked preview -->
-            <div class="modal__preview">
-                <img id="modal-preview-img" src="" alt="" loading="lazy" />
-                <div class="modal__watermark">
-                    <span class="modal__watermark-text">PixelVault Preview</span>
-                </div>
-            </div>
-
-            <!-- Right: metadata + buy panel -->
-            <aside class="modal__info">
-                <button class="modal__close" id="modal-close-btn" aria-label="Close detail view">✕ Close</button>
-
-                <h2 id="modal-title"></h2>
-                <p class="modal__photographer">by <strong id="modal-photographer"></strong></p>
-
-                <div class="modal__tags" id="modal-tags"></div>
-
-                <hr class="modal__divider" />
-
-                <!-- Technical specs grid -->
-                <div class="modal__specs" id="modal-specs"></div>
-
-                <hr class="modal__divider" />
-
-                <!-- Price and buy -->
-                <div class="modal__price-row">
-                    <span id="modal-price"></span>
-                    <span class="modal__license-label" id="modal-license"></span>
-                </div>
-
-                <button class="btn btn-primary" id="modal-buy-btn">
-                    Buy &amp; Download
-                </button>
-            </aside>
-        </div>
-    </div>
-
-    <!-- ====================================================================
-         AUTH MODAL (Login / Sign Up)
-    ===================================================================== -->
-    <div class="auth-modal-backdrop" id="auth-modal" role="dialog" aria-modal="true" aria-label="Authentication">
-        <div class="auth-modal">
-            <!-- Title changes between "Log in" and "Create account" -->
-            <h2 class="auth-modal__title" id="auth-modal-title">Log in</h2>
-            <p class="auth-modal__subtitle" id="auth-modal-subtitle">
-                New here?
-                <a id="auth-toggle-link">Create an account</a>
+            <p class="hero__sub">
+                Thousands of premium photos and 4K videos — shot by independent wildlife photographers across six
+                continents. Priced fairly. Licensed clearly.
             </p>
 
-            <!-- Fields that only show during sign-up -->
-            <div id="signup-fields" style="display:none">
-                <div class="form-group">
-                    <label for="auth-display-name">Display name</label>
-                    <input id="auth-display-name" type="text" placeholder="Jane Photographer" autocomplete="name" />
-                </div>
-                <div class="form-group">
-                    <label for="auth-role">I am a…</label>
-                    <select id="auth-role">
-                        <option value="customer">Customer (I buy &amp; download)</option>
-                        <option value="photographer">Photographer (I upload &amp; sell)</option>
-                    </select>
-                </div>
+            <div class="hero__actions">
+                <a href="gallery.html" class="btn-primary">Explore the library</a>
+                <a href="dashboard.html" class="btn-ghost">Upload & sell</a>
             </div>
 
-            <!-- Always-visible fields -->
-            <div class="form-group">
-                <label for="auth-email">Email</label>
-                <input id="auth-email" type="email" placeholder="you@example.com" autocomplete="email" />
-            </div>
-            <div class="form-group">
-                <label for="auth-password">Password</label>
-                <input id="auth-password" type="password" placeholder="••••••••" autocomplete="current-password" />
-            </div>
+        </div>
 
-            <button class="btn btn-primary auth-modal__submit" id="auth-submit-btn">Log in</button>
-            <button class="btn btn-ghost auth-modal__submit" id="auth-cancel-btn" style="margin-top:8px">Cancel</button>
+        <!-- Right: real wildlife photography slideshow -->
+        <div class="hero__image-panel" aria-hidden="true">
+            <div class="hero__slideshow">
+                <img class="hero__slide is-active"
+                    src="https://images.unsplash.com/photo-1549366021-9f761d450615?auto=format&amp;fit=crop&amp;w=1600&amp;q=85"
+                    alt="">
+                <img class="hero__slide"
+                    src="https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?auto=format&amp;fit=crop&amp;w=1600&amp;q=85"
+                    alt="">
+                <img class="hero__slide"
+                    src="https://images.unsplash.com/photo-1535338454770-8be927b5a00b?auto=format&amp;fit=crop&amp;w=1600&amp;q=85"
+                    alt="">
+            </div>
+            <!-- Signature bleed word -->
+            <span class="hero__bleed-word">Wildlife</span>
+        </div>
+    </section>
 
-            <p class="auth-error" id="auth-error" aria-live="polite"></p>
+    <!-- =====================================================================
+     MARQUEE
+====================================================================== -->
+    <div class="marquee-strip" aria-hidden="true">
+        <div class="marquee-track">
+            <!-- Duplicated for seamless loop -->
+            <span class="marquee-item">Wildlife Photography</span>
+            <span class="marquee-item">4K Video Footage</span>
+            <span class="marquee-item">Standard License</span>
+            <span class="marquee-item">Extended License</span>
+            <span class="marquee-item">Editorial Use</span>
+            <span class="marquee-item">RAW Files Available</span>
+            <span class="marquee-item">Instant Download</span>
+            <span class="marquee-item">Wildlife Photography</span>
+            <span class="marquee-item">4K Video Footage</span>
+            <span class="marquee-item">Standard License</span>
+            <span class="marquee-item">Extended License</span>
+            <span class="marquee-item">Editorial Use</span>
+            <span class="marquee-item">RAW Files Available</span>
+            <span class="marquee-item">Instant Download</span>
         </div>
     </div>
 
-    <!-- ====================================================================
-         TOAST CONTAINER — app.js appends .toast elements here
-    ===================================================================== -->
-    <div id="toast-container" aria-live="polite" aria-atomic="false"></div>
+    <!-- =====================================================================
+     COLLECTIONS
+====================================================================== -->
+    <section class="collections" id="collections">
+        <div class="collections__header reveal">
+            <div>
+                <p class="section-label">Browse by collection</p>
+                <h2 class="section-title">Every habitat.<br><em>Every species.</em></h2>
+            </div>
+            <a href="gallery.html" class="btn-ghost reveal reveal-delay-1">View all collections →</a>
+        </div>
 
-    <!-- ====================================================================
-         FOOTER
-    ===================================================================== -->
+        <div class="collections__grid reveal reveal-delay-2">
+            <div class="col-card">
+                <div class="col-card__overlay">
+                    <p class="col-card__tag">Featured collection</p>
+                    <h3 class="col-card__title">Predators in Motion</h3>
+                    <p class="col-card__count">340 assets · From $12</p>
+                </div>
+            </div>
+            <div class="col-card">
+                <div class="col-card__overlay">
+                    <p class="col-card__tag">Aerial</p>
+                    <h3 class="col-card__title">Canopy & Forest Floor</h3>
+                    <p class="col-card__count">218 assets · From $8</p>
+                </div>
+            </div>
+            <div class="col-card">
+                <div class="col-card__overlay">
+                    <p class="col-card__tag">Marine</p>
+                    <h3 class="col-card__title">Deep Blue</h3>
+                    <p class="col-card__count">190 assets · From $15</p>
+                </div>
+            </div>
+            <div class="col-card">
+                <div class="col-card__overlay">
+                    <p class="col-card__tag">Landscape</p>
+                    <h3 class="col-card__title">Golden Hour Savannas</h3>
+                    <p class="col-card__count">275 assets · From $10</p>
+                </div>
+            </div>
+            <div class="col-card">
+                <div class="col-card__overlay">
+                    <p class="col-card__tag">4K Video</p>
+                    <h3 class="col-card__title">Migration Season</h3>
+                    <p class="col-card__count">88 clips · From $29</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+     HOW IT WORKS
+====================================================================== -->
+    <section class="process" id="how-it-works">
+        <div class="process__inner">
+            <div class="reveal">
+                <p class="section-label">How licensing works</p>
+                <h2 class="section-title">Three steps.<br><em>One download.</em></h2>
+            </div>
+
+            <div class="process__steps">
+                <div class="process__step reveal reveal-delay-1">
+                    <div class="process__step-num">I</div>
+                    <h3 class="process__step-title">Find your asset</h3>
+                    <p class="process__step-body">
+                        Search by species, habitat, or keyword. Filter by file type, resolution, or license. Every asset
+                        shows a watermarked preview before you commit.
+                    </p>
+                </div>
+                <div class="process__step reveal reveal-delay-2">
+                    <div class="process__step-num">II</div>
+                    <h3 class="process__step-title">Choose a license</h3>
+                    <p class="process__step-body">
+                        Standard for web and print. Extended for merchandise and broadcast. Editorial for news and
+                        documentary. No subscriptions, no surprises.
+                    </p>
+                </div>
+                <div class="process__step reveal reveal-delay-3">
+                    <div class="process__step-num">III</div>
+                    <h3 class="process__step-title">Download instantly</h3>
+                    <p class="process__step-body">
+                        Full-resolution file delivered immediately. Original RAW files available on select assets. Your
+                        license is on file forever.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+     FEATURED ASSET
+====================================================================== -->
+    <section class="featured">
+        <div class="reveal">
+            <p class="section-label">Asset spotlight</p>
+            <h2 class="section-title" style="margin-bottom:32px">This week's<br><em>editor's pick.</em></h2>
+        </div>
+
+        <div class="featured__inner reveal reveal-delay-1">
+            <div class="featured__image"></div>
+            <div class="featured__info">
+                <div>
+                    <p class="featured__category">Wildlife · Mammals · Africa</p>
+                    <h3 class="featured__title">
+                        Lioness at<br>
+                        <em>First Light</em>
+                    </h3>
+                    <div class="featured__meta">
+                        <div class="featured__meta-row">
+                            <span>Resolution</span>
+                            <span>7360 × 4912 px</span>
+                        </div>
+                        <div class="featured__meta-row">
+                            <span>Format</span>
+                            <span>JPEG + RAW</span>
+                        </div>
+                        <div class="featured__meta-row">
+                            <span>Photographer</span>
+                            <span>A. Mukherjee</span>
+                        </div>
+                        <div class="featured__meta-row">
+                            <span>License</span>
+                            <span>Standard / Extended</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="featured__price"><sup>$</sup>29</div>
+                    <div class="featured__cta" style="margin-top:20px">
+                        <a href="gallery.html" class="btn-violet">License this asset</a>
+                        <a href="gallery.html" class="btn-outline-sm">Preview watermarked</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+     TRUST / SOCIAL PROOF
+====================================================================== -->
+    <section class="trust">
+        <div class="trust__inner">
+            <div class="reveal">
+                <blockquote class="trust__quote">
+                    The quality of wildlife imagery on Natbios is unlike anything I've found on the major platforms.
+                    Genuine field photographers, not stock agency farms.
+                </blockquote>
+                <p class="trust__author"><strong>Priya Nair</strong> — Creative Director, Wildframe Studio</p>
+            </div>
+
+            <div class="trust__numbers reveal reveal-delay-1">
+                <div class="trust__number-item">
+                    <div class="trust__big-num">94%</div>
+                    <div class="trust__num-label">of buyers return<br>for a second license</div>
+                </div>
+                <div class="trust__number-item">
+                    <div class="trust__big-num">48h</div>
+                    <div class="trust__num-label">average time from upload<br>to first sale for top photographers</div>
+                </div>
+                <div class="trust__number-item">
+                    <div class="trust__big-num">20TB</div>
+                    <div class="trust__num-label">of original content<br>stored and delivered securely</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+     CTA BANNER
+====================================================================== -->
+    <section class="cta-banner">
+        <div class="cta-banner__inner reveal">
+            <h2 class="cta-banner__title">
+                Your next project<br>deserves <em>the real thing.</em>
+            </h2>
+            <p class="cta-banner__sub">
+                No AI-generated stock. No staged shots. Every image and video on Natbios was captured in the field by
+                photographers who were actually there.
+            </p>
+            <div class="cta-banner__actions">
+                <a href="gallery.html" class="btn-primary">Browse the library</a>
+                <a href="dashboard.html" class="btn-ghost">Sell your work</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+     ABOUT & CONTACT
+====================================================================== -->
+    <section class="about-contact">
+        <div class="about-contact__grid">
+            <div class="reveal" id="about">
+                <p class="section-label">About Natbios</p>
+                <h2 class="section-title">Made for people<br><em>who protect the wild.</em></h2>
+                <p class="about-contact__body">Natbios connects independent nature photographers with designers,
+                    filmmakers, publishers, and conservation teams seeking imagery with a real sense of place.</p>
+            </div>
+            <div class="reveal reveal-delay-1" id="contact">
+                <p class="section-label">Contact</p>
+                <h2 class="section-title">Let’s make<br><em>something meaningful.</em></h2>
+                <p class="about-contact__body">Questions about licensing, a custom brief, or contributing your work? Our
+                    team is ready to help.</p>
+                <a class="contact-link" href="mailto:natbiosproductions@gmail.com">natbiosproductions@gmail.com</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+     FOOTER
+====================================================================== -->
     <footer class="footer">
-        <p>© <span id="footer-year"></span> PixelVault. All rights reserved.</p>
+        <div class="footer__inner">
+            <div class="footer__logo">Nat<em>bios</em> Stock</div>
+            <div class="footer__links">
+                <a href="#about" class="footer__link">About</a>
+                <a href="#contact" class="footer__link">Contact</a>
+                <a href="#" class="footer__link">Licensing</a>
+                <a href="#" class="footer__link">Photographers</a>
+                <a href="#" class="footer__link">Privacy</a>
+                <a href="#" class="footer__link">Terms</a>
+            </div>
+            <p class="footer__copy">© <span id="year"></span> Natbios. All rights reserved.</p>
+        </div>
     </footer>
 
-    <!-- ====================================================================
-         APP ENTRY POINT
-         type="module" is required to use ES module import syntax inside app.js
-         (which is how we import Supabase from the CDN).
-    ===================================================================== -->
-    <script type="module" src="app.js"></script>
-
-    <!-- Set footer year without app.js dependency -->
+    <!-- =====================================================================
+     SCRIPTS
+====================================================================== -->
     <script>
-        document.getElementById('footer-year').textContent = new Date().getFullYear();
+        // Footer year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Sticky nav background on scroll
+        const nav = document.getElementById('main-nav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 60);
+        }, { passive: true });
+
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    observer.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Swap the hero's real wildlife photographs every three seconds.
+        const heroSlides = Array.from(document.querySelectorAll('.hero__slide'));
+        let activeSlide = 0;
+        if (heroSlides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            window.setInterval(() => {
+                heroSlides[activeSlide].classList.remove('is-active');
+                activeSlide = (activeSlide + 1) % heroSlides.length;
+                heroSlides[activeSlide].classList.add('is-active');
+            }, 3000);
+        }
+
+        // Mobile hamburger — simple toggle (extend for full menu if needed)
+        document.getElementById('hamburger').addEventListener('click', () => {
+            const links = document.querySelector('.nav__links');
+            const isOpen = links.style.display === 'flex';
+            links.style.display = isOpen ? 'none' : 'flex';
+            links.style.flexDirection = 'column';
+            links.style.position = 'absolute';
+            links.style.top = '72px';
+            links.style.left = '0';
+            links.style.right = '0';
+            links.style.background = 'rgba(9,9,15,.98)';
+            links.style.padding = '24px';
+            links.style.gap = '20px';
+            links.style.borderBottom = '1px solid rgba(255,255,255,.06)';
+        });
     </script>
 
 </body>
+
 </html>
