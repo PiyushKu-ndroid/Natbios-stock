@@ -1,0 +1,16 @@
+# Environment variables — NEVER commit these
+.env
+cors.json
+
+# VS Code settings
+.vscode/
+
+# Supabase local temp files
+supabase/.temp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node modules
+node_modules/

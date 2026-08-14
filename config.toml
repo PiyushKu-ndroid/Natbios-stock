@@ -1,0 +1,62 @@
+# =============================================================================
+# supabase/config.toml
+# =============================================================================
+# Supabase CLI project configuration.
+# Docs: https://supabase.com/docs/guides/cli/config
+#
+# Usage:
+#   supabase init            ← creates this file (already done)
+#   supabase link            ← links to your cloud project
+#   supabase db push         ← runs schema.sql migrations
+#   supabase functions deploy ← deploys all four Edge Functions
+# =============================================================================
+
+[api]
+# The port the local Supabase API server listens on during `supabase start`.
+port = 54321
+
+[db]
+# Local PostgreSQL port — used by `supabase db` commands.
+port = 54322
+
+[studio]
+# Supabase Studio (local dashboard) port.
+port = 54323
+
+[inbucket]
+# Local email testing server (catches auth confirmation emails during dev).
+port = 54324
+
+[storage]
+# We use Backblaze B2 for file storage, not Supabase Storage.
+# Leave this section empty — it's here for completeness.
+
+# =============================================================================
+# EDGE FUNCTIONS
+# Each [[functions]] block registers one Edge Function with the Supabase CLI.
+# `verify_jwt = true` means Supabase automatically validates the JWT in the
+# Authorization header before your function code runs.
+# Set to false only for public endpoints or those with their own auth (like
+# stripe-webhook which uses its own HMAC-SHA256 verification).
+# =============================================================================
+
+[[functions]]
+name        = "get-upload-url"
+verify_jwt  = true          # Rejects requests without a valid Supabase JWT
+
+[[functions]]
+name        = "get-download-url"
+verify_jwt  = true
+
+[[functions]]
+name        = "create-checkout"
+verify_jwt  = true
+
+[[functions]]
+name        = "stripe-webhook"
+verify_jwt  = false         # Stripe uses its own signature — not a Supabase JWT
+
+[[functions]]
+name        = "generate-thumbnail"
+verify_jwt  = false         # Called by B2 webhook (no JWT) and browser (JWT)
+                            # The function handles both auth paths internally.

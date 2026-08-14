@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — PixelVault</title>
+    <meta name="robots" content="noindex" /><!-- Don't index the dashboard -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ================================================================
+           DESIGN TOKENS — identical to index.html so the site feels unified
+        ================================================================ */
+        :root {
+            --c-bg:          #0f0f0f;
+            --c-surface:     #1a1a1a;
+            --c-surface-2:   #242424;
+            --c-border:      #2e2e2e;
+            --c-accent:      #e8c97e;
+            --c-accent-dark: #c9a94e;
+            --c-text:        #f0ede6;
+            --c-text-muted:  #888880;
+            --c-success:     #5a9e6f;
+            --c-error:       #9e5a5a;
+            --c-warning:     #b8943a;
+
+            --font-display:  'Playfair Display', Georgia, serif;
+            --font-ui:       'Inter', system-ui, sans-serif;
+
+            --radius-sm:  4px;
+            --radius-md:  8px;
+            --radius-lg:  16px;
+            --shadow-card: 0 2px 8px rgba(0,0,0,.45);
+            --transition: 150ms ease;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-ui);
+            background:  var(--c-bg);
+            color:       var(--c-text);
+            min-height:  100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { color: inherit; text-decoration: none; }
+        button { font-family: var(--font-ui); cursor: pointer; border: none; }
+        input, select, textarea { font-family: var(--font-ui); outline: none; }
+
+        /* ================================================================
+           LAYOUT — two-column sidebar + main
+        ================================================================ */
+        .app-shell {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            grid-template-rows: 60px 1fr;
+            min-height: 100vh;
+        }
+
+        /* ================================================================
+           TOP NAV
+        ================================================================ */
+        .topnav {
+            grid-column: 1 / -1;
+            display:         flex;
+            align-items:     center;
+            justify-content: space-between;
+            padding:         0 24px;
+            background:      rgba(15,15,15,.9);
+            backdrop-filter: blur(12px);
+            border-bottom:   1px solid var(--c-border);
+            position:        sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topnav__logo {
+            font-family:    var(--font-display);
+            font-size:      1.2rem;
+            color:          var(--c-accent);
+            letter-spacing: -0.01em;
+        }
+        .topnav__logo span { color: var(--c-text); }
+
+        .topnav__right {
+            display:     flex;
+            align-items: center;
+            gap:         16px;
+        }
+
+        #dash-user-email {
+            font-size:  0.8rem;
+            color:      var(--c-text-muted);
+        }
+
+        .btn {
+            display:      inline-flex;
+            align-items:  center;
+            gap:          6px;
+            padding:      8px 16px;
+            border-radius: var(--radius-sm);
+            font-size:    0.82rem;
+            font-weight:  600;
+            transition:   background var(--transition), opacity var(--transition);
+        }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+        .btn-primary  { background: var(--c-accent); color: #0f0f0f; }
+        .btn-primary:not(:disabled):hover  { background: var(--c-accent-dark); }
+        .btn-ghost    { background: transparent; color: var(--c-text-muted); border: 1px solid var(--c-border); }
+        .btn-ghost:not(:disabled):hover    { color: var(--c-text); border-color: var(--c-text-muted); }
+        .btn-danger   { background: transparent; color: var(--c-error); border: 1px solid var(--c-error); }
+        .btn-danger:not(:disabled):hover   { background: var(--c-error); color: #fff; }
+
+        /* ================================================================
+           SIDEBAR
+        ================================================================ */
+        .sidebar {
+            grid-row:    2;
+            grid-column: 1;
+            background:  var(--c-surface);
+            border-right: 1px solid var(--c-border);
+            padding:     24px 0;
+            position:    sticky;
+            top:         60px;
+            height:      calc(100vh - 60px);
+            overflow-y:  auto;
+        }
+
+        .sidebar__section {
+            padding:       0 16px;
+            margin-bottom: 28px;
+        }
+
+        .sidebar__label {
+            font-size:      0.65rem;
+            font-weight:    600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color:          var(--c-text-muted);
+            padding:        0 8px;
+            margin-bottom:  8px;
+        }
+
+        .sidebar__nav { display: flex; flex-direction: column; gap: 2px; }
+
+        .sidebar__link {
+            display:       flex;
+            align-items:   center;
+            gap:           10px;
+            padding:       9px 12px;
+            border-radius: var(--radius-sm);
+            font-size:     0.85rem;
+            color:         var(--c-text-muted);
+            cursor:        pointer;
+            transition:    background var(--transition), color var(--transition);
+        }
+        .sidebar__link:hover      { background: var(--c-surface-2); color: var(--c-text); }
+        .sidebar__link.is-active  { background: var(--c-surface-2); color: var(--c-accent); }
+
+        .sidebar__icon { font-size: 1rem; width: 20px; text-align: center; }
+
+        /* Stats mini-cards in the sidebar */
+        .sidebar__stats {
+            display:        flex;
+            flex-direction: column;
+            gap:            8px;
+            padding:        0 8px;
+        }
+
+        .stat-mini {
+            background:    var(--c-surface-2);
+            border:        1px solid var(--c-border);
+            border-radius: var(--radius-sm);
+            padding:       10px 12px;
+        }
+
+        .stat-mini__value {
+            font-family: var(--font-display);
+            font-size:   1.4rem;
+            color:       var(--c-accent);
+            line-height: 1;
+        }
+
+        .stat-mini__label {
+            font-size:  0.68rem;
+            color:      var(--c-text-muted);
+            margin-top: 3px;
+        }
+
+        /* ================================================================
+           MAIN CONTENT AREA
+        ================================================================ */
+        .main {
+            grid-row:    2;
+            grid-column: 2;
+            padding:     32px;
+            overflow-y:  auto;
+        }
+
+        /* Page sections — only one shown at a time via JS */
+        .page-section { display: none; }
+        .page-section.is-active { display: block; }
+
+        .section-header {
+            display:         flex;
+            align-items:     center;
+            justify-content: space-between;
+            margin-bottom:   28px;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size:   1.8rem;
+            color:       var(--c-text);
+        }
+
+        .section-subtitle {
+            font-size:  0.85rem;
+            color:      var(--c-text-muted);
+            margin-top: 4px;
+        }
+
+        /* ================================================================
+           OVERVIEW PAGE — stat cards row
+        ================================================================ */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap:     16px;
+            margin-bottom: 36px;
+        }
+
+        .stat-card {
+            background:    var(--c-surface);
+            border:        1px solid var(--c-border);
+            border-radius: var(--radius-md);
+            padding:       20px;
+        }
+
+        .stat-card__value {
+            font-family: var(--font-display);
+            font-size:   2.2rem;
+            color:       var(--c-accent);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-card__label {
+            font-size:  0.75rem;
+            color:      var(--c-text-muted);
+            font-weight: 500;
+        }
+
+        /* Recent assets mini-table on overview */
+        .panel {
+            background:    var(--c-surface);
+            border:        1px solid var(--c-border);
+            border-radius: var(--radius-md);
+            overflow:      hidden;
+            margin-bottom: 24px;
+        }
+
+        .panel__header {
+            display:         flex;
+            align-items:     center;
+            justify-content: space-between;
+            padding:         16px 20px;
+            border-bottom:   1px solid var(--c-border);
+        }
+
+        .panel__title {
+            font-size:   0.9rem;
+            font-weight: 600;
+        }
+
+        .panel__body { padding: 0; }
+
+        /* Mini asset table */
+        .asset-table { width: 100%; border-collapse: collapse; }
+
+        .asset-table th {
+            font-size:      0.68rem;
+            font-weight:    600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color:          var(--c-text-muted);
+            padding:        10px 20px;
+            text-align:     left;
+            border-bottom:  1px solid var(--c-border);
+            background:     var(--c-surface-2);
+        }
+
+        .asset-table td {
+            padding:       12px 20px;
+            font-size:     0.83rem;
+            border-bottom: 1px solid var(--c-border);
+            vertical-align: middle;
+        }
+
+        .asset-table tr:last-child td { border-bottom: none; }
+
+        .asset-table tr:hover td { background: var(--c-surface-2); }
+
+        .asset-thumb-cell {
+            display:     flex;
+            align-items: center;
+            gap:         12px;
+        }
+
+        .asset-thumb-cell img {
+            width:         44px;
+            height:        44px;
+            object-fit:    cover;
+            border-radius: var(--radius-sm);
+            background:    var(--c-surface-2);
+            flex-shrink:   0;
+        }
+
+        .asset-thumb-cell strong {
+            display:            block;
+            font-size:          0.83rem;
+            max-width:          220px;
+            overflow:           hidden;
+            text-overflow:      ellipsis;
+            white-space:        nowrap;
+        }
+
+        .asset-thumb-cell span {
+            font-size:  0.72rem;
+            color:      var(--c-text-muted);
+        }
+
+        /* Status badge */
+        .badge {
+            display:       inline-block;
+            padding:       3px 9px;
+            border-radius: 999px;
+            font-size:     0.68rem;
+            font-weight:   600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .badge-pending  { background: rgba(184,148,58,.15);  color: var(--c-warning); }
+        .badge-active   { background: rgba(90,158,111,.15);  color: var(--c-success); }
+        .badge-rejected { background: rgba(158,90,90,.15);   color: var(--c-error);   }
+
+        /* ================================================================
+           UPLOAD PAGE — the drag-and-drop zone + metadata form
+        ================================================================ */
+        #upload-section { max-width: 760px; }
+
+        /* Drop zone */
+        .drop-zone {
+            border:        2px dashed var(--c-border);
+            border-radius: var(--radius-lg);
+            padding:       56px 32px;
+            text-align:    center;
+            cursor:        pointer;
+            transition:    border-color var(--transition), background var(--transition);
+            background:    var(--c-surface);
+            position:      relative;
+        }
+
+        .drop-zone.is-over {
+            border-color: var(--c-accent);
+            background:   rgba(232,201,126,.04);
+        }
+
+        /* Hide the native file input but keep it accessible */
+        #file-input {
+            position: absolute;
+            inset:    0;
+            opacity:  0;
+            cursor:   pointer;
+            width:    100%;
+            height:   100%;
+        }
+
+        .drop-zone__icon {
+            font-size:     2.8rem;
+            margin-bottom: 12px;
+            display:       block;
+            opacity:       0.5;
+        }
+
+        .drop-zone__title {
+            font-size:   1rem;
+            font-weight: 600;
+            color:       var(--c-text);
+            margin-bottom: 6px;
+        }
+
+        .drop-zone__sub {
+            font-size: 0.82rem;
+            color:     var(--c-text-muted);
+        }
+
+        .drop-zone__sub em { color: var(--c-accent); font-style: normal; }
+
+        /* Upload queue — list of files being processed */
+        #upload-queue {
+            display:        flex;
+            flex-direction: column;
+            gap:            12px;
+            margin-top:     24px;
+        }
+
+        .queue-item {
+            background:    var(--c-surface);
+            border:        1px solid var(--c-border);
+            border-radius: var(--radius-md);
+            padding:       16px 18px;
+            display:       grid;
+            grid-template-columns: 64px 1fr auto;
+            gap:           0 14px;
+            align-items:   start;
+        }
+
+        .queue-item__thumb {
+            grid-row:   1 / 3;
+            width:      64px;
+            height:     64px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            background: var(--c-surface-2);
+        }
+
+        .queue-item__name {
+            font-size:     0.85rem;
+            font-weight:   600;
+            overflow:      hidden;
+            text-overflow: ellipsis;
+            white-space:   nowrap;
+            max-width:     100%;
+        }
+
+        .queue-item__size {
+            font-size: 0.72rem;
+            color:     var(--c-text-muted);
+            margin-top: 2px;
+        }
+
+        .queue-item__remove {
+            background: transparent;
+            border:     none;
+            color:      var(--c-text-muted);
+            font-size:  1rem;
+            padding:    0 4px;
+            cursor:     pointer;
+            transition: color var(--transition);
+        }
+        .queue-item__remove:hover { color: var(--c-error); }
+
+        /* Progress bar */
+        .queue-item__progress-wrap {
+            grid-column: 2 / 4;
+            margin-top:  8px;
+        }
+
+        .progress-bar {
+            height:        5px;
+            background:    var(--c-surface-2);
+            border-radius: 999px;
+            overflow:      hidden;
+            margin-bottom: 4px;
+        }
+
+        .progress-bar__fill {
+            height:     100%;
+            background: var(--c-accent);
+            border-radius: 999px;
+            width:      0%;
+            transition: width 200ms ease;
+        }
+
+        .queue-item__progress-label {
+            font-size: 0.72rem;
+            color:     var(--c-text-muted);
+        }
+
+        /* Status icons on completed / failed queue items */
+        .queue-item.is-done   { border-color: var(--c-success); }
+        .queue-item.is-error  { border-color: var(--c-error);   }
+
+        /* Metadata form — shown below the queue */
+        #meta-form-wrap {
+            margin-top: 32px;
+            display:    none; /* shown once files are queued */
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap:     16px 20px;
+        }
+        .form-grid .span-2 { grid-column: 1 / -1; }
+
+        .form-group {
+            display:        flex;
+            flex-direction: column;
+            gap:            6px;
+        }
+
+        .form-group label {
+            font-size:      0.72rem;
+            font-weight:    600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color:          var(--c-text-muted);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding:       11px 13px;
+            border-radius: var(--radius-sm);
+            background:    var(--c-bg);
+            border:        1px solid var(--c-border);
+            color:         var(--c-text);
+            font-size:     0.875rem;
+            transition:    border-color var(--transition);
+            resize:        vertical;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus { border-color: var(--c-accent); }
+        .form-group textarea { min-height: 80px; }
+        .form-group select option { background: var(--c-surface); }
+
+        /* Tag input — the pill-style tag entry */
+        .tag-input-wrap {
+            display:       flex;
+            flex-wrap:     wrap;
+            gap:           6px;
+            padding:       8px 10px;
+            border-radius: var(--radius-sm);
+            background:    var(--c-bg);
+            border:        1px solid var(--c-border);
+            min-height:    44px;
+            cursor:        text;
+            transition:    border-color var(--transition);
+        }
+        .tag-input-wrap:focus-within { border-color: var(--c-accent); }
+
+        .tag-chip {
+            display:      flex;
+            align-items:  center;
+            gap:          5px;
+            padding:      3px 10px;
+            background:   var(--c-surface-2);
+            border:       1px solid var(--c-border);
+            border-radius: 999px;
+            font-size:    0.75rem;
+            color:        var(--c-text);
+            white-space:  nowrap;
+        }
+
+        .tag-chip button {
+            background:  transparent;
+            color:       var(--c-text-muted);
+            font-size:   0.75rem;
+            padding:     0;
+            line-height: 1;
+            display:     flex;
+            align-items: center;
+        }
+        .tag-chip button:hover { color: var(--c-error); }
+
+        #tag-text-input {
+            border:     none;
+            background: transparent;
+            color:      var(--c-text);
+            font-size:  0.875rem;
+            outline:    none;
+            min-width:  100px;
+            flex:       1;
+            padding:    2px 4px;
+        }
+        #tag-text-input::placeholder { color: var(--c-text-muted); }
+
+        /* Apply-to-all notice */
+        .form-notice {
+            font-size:   0.78rem;
+            color:       var(--c-text-muted);
+            padding:     10px 14px;
+            border:      1px solid var(--c-border);
+            border-radius: var(--radius-sm);
+            background:  var(--c-surface-2);
+            margin-bottom: 20px;
+        }
+
+        .form-notice strong { color: var(--c-accent); }
+
+        #upload-all-btn {
+            margin-top: 24px;
+            padding:    13px 32px;
+            font-size:  0.95rem;
+        }
+
+        /* ================================================================
+           MY ASSETS PAGE — searchable table of own uploads
+        ================================================================ */
+        .assets-toolbar {
+            display:         flex;
+            align-items:     center;
+            justify-content: space-between;
+            gap:             12px;
+            margin-bottom:   16px;
+        }
+
+        #assets-search-input {
+            padding:       9px 14px;
+            border-radius: var(--radius-sm);
+            background:    var(--c-surface);
+            border:        1px solid var(--c-border);
+            color:         var(--c-text);
+            font-size:     0.85rem;
+            width:         240px;
+        }
+        #assets-search-input:focus { border-color: var(--c-accent); outline: none; }
+
+        /* ================================================================
+           EMPTY STATES
+        ================================================================ */
+        .empty-state {
+            text-align: center;
+            padding:    56px 24px;
+            color:      var(--c-text-muted);
+        }
+        .empty-state__icon  { font-size: 3rem; margin-bottom: 12px; opacity: .4; }
+        .empty-state__title { font-size: 1rem; font-weight: 600; color: var(--c-text); margin-bottom: 6px; }
+        .empty-state__sub   { font-size: 0.83rem; }
+
+        /* ================================================================
+           AUTH GATE — full-screen blocker shown before session is confirmed
+        ================================================================ */
+        #auth-gate {
+            position:   fixed;
+            inset:      0;
+            z-index:    999;
+            background: var(--c-bg);
+            display:    flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .spinner {
+            width:  36px;
+            height: 36px;
+            border: 3px solid var(--c-border);
+            border-top-color: var(--c-accent);
+            border-radius: 50%;
+            animation: spin 700ms linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #auth-gate p { font-size: 0.85rem; color: var(--c-text-muted); }
+
+        /* ================================================================
+           TOAST
+        ================================================================ */
+        #toast-container {
+            position: fixed;
+            bottom:   24px;
+            right:    24px;
+            z-index:  500;
+            display:  flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding:       12px 18px;
+            border-radius: var(--radius-md);
+            font-size:     0.875rem;
+            font-weight:   500;
+            background:    var(--c-surface-2);
+            border:        1px solid var(--c-border);
+            color:         var(--c-text);
+            box-shadow:    var(--shadow-card);
+            animation:     toast-in 250ms ease forwards;
+            max-width:     320px;
+        }
+        .toast.success { border-color: var(--c-success); }
+        .toast.error   { border-color: var(--c-error); }
+        @keyframes toast-in {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ================================================================
+           RESPONSIVE
+        ================================================================ */
+        @media (max-width: 860px) {
+            .app-shell { grid-template-columns: 1fr; }
+            .sidebar {
+                grid-row:    2;
+                grid-column: 1;
+                position:    static;
+                height:      auto;
+                display:     flex;
+                gap:         0;
+                overflow-x:  auto;
+                padding:     12px 16px;
+                flex-direction: row;
+                border-right:  none;
+                border-bottom: 1px solid var(--c-border);
+            }
+            .sidebar__section { margin-bottom: 0; padding: 0; }
+            .sidebar__label   { display: none; }
+            .sidebar__nav     { flex-direction: row; gap: 4px; }
+            .sidebar__stats   { display: none; }
+            .main { grid-row: 3; grid-column: 1; padding: 20px 16px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-grid .span-2 { grid-column: 1; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========================================================================
+     AUTH GATE — shown while we verify the session; prevents flash of content
+     for unauthenticated users. dashboard.js removes this once auth is confirmed.
+======================================================================== -->
+<div id="auth-gate">
+    <div class="spinner"></div>
+    <p>Verifying your session…</p>
+</div>
+
+<!-- ========================================================================
+     APP SHELL
+======================================================================== -->
+<div class="app-shell">
+
+    <!-- TOP NAV -->
+    <header class="topnav">
+        <a href="index.html" class="topnav__logo">Pixel<span>Vault</span></a>
+        <div class="topnav__right">
+            <span id="dash-user-email"></span>
+            <a href="index.html" class="btn btn-ghost">← Browse</a>
+            <button id="btn-logout" class="btn btn-ghost">Log out</button>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" role="navigation" aria-label="Dashboard navigation">
+        <div class="sidebar__section">
+            <p class="sidebar__label">Menu</p>
+            <nav class="sidebar__nav">
+                <button class="sidebar__link is-active" data-page="overview">
+                    <span class="sidebar__icon">◈</span> Overview
+                </button>
+                <button class="sidebar__link" data-page="upload">
+                    <span class="sidebar__icon">↑</span> Upload
+                </button>
+                <button class="sidebar__link" data-page="my-assets">
+                    <span class="sidebar__icon">⊞</span> My Assets
+                </button>
+                <button class="sidebar__link" data-page="earnings">
+                    <span class="sidebar__icon">$</span> Earnings
+                </button>
+            </nav>
+        </div>
+
+        <div class="sidebar__section">
+            <p class="sidebar__label">At a glance</p>
+            <div class="sidebar__stats">
+                <div class="stat-mini">
+                    <div class="stat-mini__value" id="stat-total-assets">—</div>
+                    <div class="stat-mini__label">Total assets</div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini__value" id="stat-total-sales">—</div>
+                    <div class="stat-mini__label">Total sales</div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini__value" id="stat-earnings">—</div>
+                    <div class="stat-mini__label">Earnings</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <!-- ============================================================
+             OVERVIEW PAGE
+        ============================================================ -->
+        <section id="overview-section" class="page-section is-active">
+            <div class="section-header">
+                <div>
+                    <h1 class="section-title">Overview</h1>
+                    <p class="section-subtitle" id="overview-greeting">Welcome back.</p>
+                </div>
+                <button class="btn btn-primary" data-page="upload">+ Upload assets</button>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-card__value" id="ov-total-assets">0</div>
+                    <div class="stat-card__label">Assets uploaded</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__value" id="ov-active-assets">0</div>
+                    <div class="stat-card__label">Live on site</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__value" id="ov-total-downloads">0</div>
+                    <div class="stat-card__label">Total downloads</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__value" id="ov-earnings">$0</div>
+                    <div class="stat-card__label">Lifetime earnings</div>
+                </div>
+            </div>
+
+            <!-- Recent uploads table -->
+            <div class="panel">
+                <div class="panel__header">
+                    <span class="panel__title">Recent uploads</span>
+                </div>
+                <div class="panel__body">
+                    <table class="asset-table" id="recent-assets-table">
+                        <thead>
+                            <tr>
+                                <th>Asset</th>
+                                <th>Type</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Downloads</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-assets-body">
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <div class="empty-state__icon">⊞</div>
+                                        <p class="empty-state__title">No assets yet</p>
+                                        <p class="empty-state__sub">Upload your first photo or video to get started.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             UPLOAD PAGE
+        ============================================================ -->
+        <section id="upload-section" class="page-section">
+            <div class="section-header">
+                <div>
+                    <h1 class="section-title">Upload</h1>
+                    <p class="section-subtitle">Files upload directly to storage — your bandwidth isn't used.</p>
+                </div>
+            </div>
+
+            <!-- Drop zone -->
+            <div class="drop-zone" id="drop-zone">
+                <input
+                    type="file"
+                    id="file-input"
+                    multiple
+                    accept="image/jpeg,image/png,image/webp,image/tiff,image/x-raw,video/mp4,video/quicktime"
+                    aria-label="Select files to upload"
+                />
+                <span class="drop-zone__icon">⬆</span>
+                <p class="drop-zone__title">Drop files here, or click to browse</p>
+                <p class="drop-zone__sub">
+                    Supports <em>JPEG, PNG, TIFF, RAW, MP4, MOV</em> · Max <em>4 GB</em> per file
+                </p>
+            </div>
+
+            <!-- Upload queue — populated by JS -->
+            <div id="upload-queue"></div>
+
+            <!-- Metadata form — appears once files are queued -->
+            <div id="meta-form-wrap">
+                <div class="form-notice">
+                    <strong>Metadata applies to all queued files.</strong>
+                    You can edit individual titles after publishing.
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="meta-title">Title <span style="color:var(--c-error)">*</span></label>
+                        <input id="meta-title" type="text" placeholder="Morning light over the Alps" maxlength="200" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="meta-price">Price (USD)</label>
+                        <input id="meta-price" type="number" placeholder="29.99" min="0" step="0.01" value="29.99" />
+                    </div>
+
+                    <div class="form-group span-2">
+                        <label for="meta-description">Description</label>
+                        <textarea id="meta-description" placeholder="Add context about this shot — location, conditions, equipment…" maxlength="2000"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="meta-license">License type</label>
+                        <select id="meta-license">
+                            <option value="standard">Standard — web, print, presentations</option>
+                            <option value="extended">Extended — merchandise, resale</option>
+                            <option value="editorial">Editorial — news &amp; editorial use only</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tags (press Enter to add)</label>
+                        <div class="tag-input-wrap" id="tag-input-wrap">
+                            <input
+                                type="text"
+                                id="tag-text-input"
+                                placeholder="landscape, nature, 4k…"
+                                maxlength="50"
+                                autocomplete="off"
+                                spellcheck="false"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="upload-all-btn">
+                    Upload all &amp; publish for review
+                </button>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             MY ASSETS PAGE
+        ============================================================ -->
+        <section id="my-assets-section" class="page-section">
+            <div class="section-header">
+                <div>
+                    <h1 class="section-title">My Assets</h1>
+                    <p class="section-subtitle">All uploads — including pending review and rejected.</p>
+                </div>
+            </div>
+
+            <div class="assets-toolbar">
+                <input type="search" id="assets-search-input" placeholder="Filter by title…" />
+                <button class="btn btn-primary" data-page="upload">+ Upload more</button>
+            </div>
+
+            <div class="panel">
+                <div class="panel__body">
+                    <table class="asset-table">
+                        <thead>
+                            <tr>
+                                <th>Asset</th>
+                                <th>Type</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Downloads</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="my-assets-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             EARNINGS PAGE
+        ============================================================ -->
+        <section id="earnings-section" class="page-section">
+            <div class="section-header">
+                <div>
+                    <h1 class="section-title">Earnings</h1>
+                    <p class="section-subtitle">Your completed sales and payout history.</p>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-card__value" id="earn-lifetime">$0.00</div>
+                    <div class="stat-card__label">Lifetime revenue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__value" id="earn-pending">$0.00</div>
+                    <div class="stat-card__label">Pending payout</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__value" id="earn-sales">0</div>
+                    <div class="stat-card__label">Total sales</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel__header">
+                    <span class="panel__title">Sales history</span>
+                </div>
+                <div class="panel__body">
+                    <table class="asset-table">
+                        <thead>
+                            <tr>
+                                <th>Asset</th>
+                                <th>License</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="earnings-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main><!-- /.main -->
+</div><!-- /.app-shell -->
+
+<div id="toast-container" aria-live="polite"></div>
+
+<!-- dashboard.js is also type="module" so it can import from app.js -->
+<script type="module" src="dashboard.js"></script>
+</body>
+</html>

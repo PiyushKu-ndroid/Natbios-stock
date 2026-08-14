@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purchase Complete — PixelVault</title>
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --c-bg:         #0f0f0f;
+            --c-surface:    #1a1a1a;
+            --c-border:     #2e2e2e;
+            --c-accent:     #e8c97e;
+            --c-text:       #f0ede6;
+            --c-text-muted: #888880;
+            --c-success:    #5a9e6f;
+            --c-error:      #9e5a5a;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-ui:      'Inter', system-ui, sans-serif;
+            --radius-md:    8px;
+            --radius-lg:    16px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family:    var(--font-ui);
+            background:     var(--c-bg);
+            color:          var(--c-text);
+            min-height:     100vh;
+            display:        flex;
+            flex-direction: column;
+            align-items:    center;
+            justify-content: center;
+            padding:        24px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .card {
+            background:    var(--c-surface);
+            border:        1px solid var(--c-border);
+            border-radius: var(--radius-lg);
+            padding:       48px 40px;
+            max-width:     480px;
+            width:         100%;
+            text-align:    center;
+        }
+
+        /* Animated checkmark / spinner */
+        .icon-wrap {
+            width:         72px;
+            height:        72px;
+            margin:        0 auto 24px;
+            border-radius: 50%;
+            display:       flex;
+            align-items:   center;
+            justify-content: center;
+            font-size:     2rem;
+        }
+        .icon-wrap.success { background: rgba(90,158,111,.15); }
+        .icon-wrap.error   { background: rgba(158,90,90,.15); }
+        .icon-wrap.loading {
+            border:        3px solid var(--c-border);
+            border-top-color: var(--c-accent);
+            animation:     spin 700ms linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        h1 {
+            font-family:   var(--font-display);
+            font-size:     1.8rem;
+            margin-bottom: 12px;
+        }
+
+        p {
+            font-size:  0.9rem;
+            color:      var(--c-text-muted);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .actions {
+            display:        flex;
+            flex-direction: column;
+            gap:            10px;
+            margin-top:     28px;
+        }
+
+        .btn {
+            display:       flex;
+            align-items:   center;
+            justify-content: center;
+            gap:           8px;
+            padding:       13px 24px;
+            border-radius: var(--radius-md);
+            font-family:   var(--font-ui);
+            font-size:     0.9rem;
+            font-weight:   600;
+            cursor:        pointer;
+            border:        none;
+            text-decoration: none;
+            transition:    background 150ms ease, opacity 150ms ease;
+        }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+        .btn-primary { background: var(--c-accent); color: #0f0f0f; }
+        .btn-primary:not(:disabled):hover { background: #c9a94e; }
+        .btn-ghost   { background: transparent; color: var(--c-text-muted); border: 1px solid var(--c-border); }
+        .btn-ghost:hover { color: var(--c-text); }
+
+        /* Countdown bar shown while auto-download triggers */
+        .countdown-bar {
+            height:        3px;
+            background:    var(--c-border);
+            border-radius: 999px;
+            overflow:      hidden;
+            margin-top:    20px;
+        }
+        .countdown-bar__fill {
+            height:     100%;
+            background: var(--c-accent);
+            width:      100%;
+            transition: width 3s linear;
+        }
+
+        .asset-title {
+            font-weight: 600;
+            color:       var(--c-text);
+            font-size:   1rem;
+            margin-top:  4px;
+        }
+
+        #status-text { min-height: 24px; }
+    </style>
+</head>
+<body>
+<div class="card" id="card">
+    <!-- State: loading (default) -->
+    <div class="icon-wrap loading" id="icon"></div>
+    <h1 id="heading">Processing…</h1>
+    <p id="status-text">Verifying your payment with Stripe.</p>
+    <p class="asset-title" id="asset-title"></p>
+    <div class="actions" id="actions" style="display:none"></div>
+</div>
+
+<script type="module">
+// =============================================================================
+// success.js (inline) — runs on the Stripe success redirect page.
+//
+// Stripe redirects here as:
+//   /success.html?session_id=cs_...&asset_id=<uuid>
+//
+// This page:
+//   1. Verifies the user is still logged in.
+//   2. Calls get-download-url to generate a signed B2 URL.
+//   3. Triggers the file download automatically after 3 seconds.
+//   4. Shows a manual "Download" button as a fallback.
+// =============================================================================
+
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL   = 'https://edbydwpdyzbowcnhlzkb.supabase.co';
+const SUPABASE_ANON  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkYnlkd3BkeXpib3djbmhsemtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1Mjc0MTQsImV4cCI6MjEwMTEwMzQxNH0.Rb0porIQKtLYjfKL9qETOGqM2vXJPqwQ1Wa0pU00lu4';
+// The base URL of your deployed Supabase Edge Functions.
+const FUNCTIONS_BASE = `${SUPABASE_URL}/functions/v1`;
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
+    auth: { persistSession: true, autoRefreshToken: true }
+});
+
+// ── DOM refs ────────────────────────────────────────────────────────────────
+const iconEl    = document.getElementById('icon');
+const headingEl = document.getElementById('heading');
+const statusEl  = document.getElementById('status-text');
+const titleEl   = document.getElementById('asset-title');
+const actionsEl = document.getElementById('actions');
+
+function setSuccess(assetTitle, downloadFn) {
+    iconEl.className    = 'icon-wrap success';
+    iconEl.textContent  = '✓';
+    headingEl.textContent = 'Payment successful!';
+    statusEl.textContent  = 'Your download will begin in 3 seconds.';
+    titleEl.textContent   = assetTitle;
+
+    // Countdown bar
+    const bar = document.createElement('div');
+    bar.className = 'countdown-bar';
+    bar.innerHTML = '<div class="countdown-bar__fill" id="bar-fill"></div>';
+    document.getElementById('card').appendChild(bar);
+
+    // Start the visual countdown (CSS transition from width:100% → 0%).
+    setTimeout(() => {
+        const fill = document.getElementById('bar-fill');
+        if (fill) fill.style.width = '0%';
+    }, 50);
+
+    // Trigger download after 3 seconds.
+    setTimeout(downloadFn, 3000);
+
+    // Show action buttons.
+    actionsEl.style.display = 'flex';
+    actionsEl.innerHTML = `
+        <button class="btn btn-primary" id="download-btn">↓ Download now</button>
+        <a href="index.html" class="btn btn-ghost">← Browse more</a>
+    `;
+    document.getElementById('download-btn').addEventListener('click', downloadFn);
+}
+
+function setError(message) {
+    iconEl.className    = 'icon-wrap error';
+    iconEl.textContent  = '✗';
+    headingEl.textContent = 'Something went wrong';
+    statusEl.textContent  = message;
+    actionsEl.style.display = 'flex';
+    actionsEl.innerHTML = `
+        <a href="index.html" class="btn btn-ghost">← Return to gallery</a>
+    `;
+}
+
+async function run() {
+    // ── 1. Read URL parameters ─────────────────────────────────────────────
+    const params    = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+    const assetId   = params.get('asset_id');
+
+    if (!sessionId || !assetId) {
+        setError('Missing payment information. Please contact support.');
+        return;
+    }
+
+    // ── 2. Check the user is still logged in ──────────────────────────────
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+        setError('Your session expired. Please log in and check My Purchases.');
+        return;
+    }
+
+    // ── 3. Fetch the asset title to display on the page ───────────────────
+    const { data: asset } = await supabase
+        .from('media_assets')
+        .select('title, mime_type')
+        .eq('id', assetId)
+        .single();
+
+    // ── 4. Request a signed download URL from our Edge Function ───────────
+    // The webhook may take a few seconds to fire after Stripe redirects here,
+    // so we retry up to 5 times with a 2-second delay.
+    let signedUrl: string | null = null;
+    let fileName = asset?.title ?? 'download';
+
+    for (let attempt = 0; attempt < 5; attempt++) {
+        if (attempt > 0) {
+            statusEl.textContent = `Confirming payment… (attempt ${attempt + 1}/5)`;
+            await new Promise(r => setTimeout(r, 2000));
+        }
+
+        try {
+            const res = await fetch(`${FUNCTIONS_BASE}/get-download-url`, {
+                method:  'POST',
+                headers: {
+                    'Content-Type':  'application/json',
+                    'Authorization': `Bearer ${session.access_token}`,
+                },
+                body: JSON.stringify({ assetId }),
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                signedUrl = data.signedUrl;
+                if (data.fileName) fileName = data.fileName;
+                break; // Got it — stop retrying.
+            }
+
+            if (res.status === 403) {
+                // Payment not yet confirmed by webhook — wait and retry.
+                continue;
+            }
+
+            // Any other error is not retryable.
+            const errData = await res.json().catch(() => ({}));
+            setError(errData.error ?? 'Failed to prepare download. Please contact support.');
+            return;
+
+        } catch (fetchErr) {
+            console.warn('Download URL fetch failed:', fetchErr);
+        }
+    }
+
+    if (!signedUrl) {
+        setError(
+            'Payment confirmed, but download is still processing. ' +
+            'Please wait a moment and visit your purchase history.'
+        );
+        return;
+    }
+
+    // ── 5. Trigger the download ────────────────────────────────────────────
+    const triggerDownload = () => {
+        const a = document.createElement('a');
+        a.href     = signedUrl!;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        statusEl.textContent = 'Download started! Check your downloads folder.';
+    };
+
+    setSuccess(asset?.title ?? '', triggerDownload);
+}
+
+run().catch(err => {
+    console.error('success.html error:', err);
+    setError('An unexpected error occurred. Please contact support.');
+});
+</script>
+</body>
+</html>
