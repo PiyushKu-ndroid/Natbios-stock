@@ -1,1559 +1,1479 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Natbios Stock — License World-Class Nature & Wildlife</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NATBIOS Productions | Environmental Documentaries & Eco-Tourism</title>
     <meta name="description"
-        content="Premium nature and wildlife photography and 4K video licensed by independent creators. Built for filmmakers, designers, and storytellers." />
+        content="NATBIOS Productions Pvt Ltd. Award-winning environmental documentaries, immersive nature tours, and relentless habitat protection.">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Cormorant Garamond: editorial serif for display — evokes wildlife documentaries and nature journals -->
-    <!-- DM Sans: clean, modern utility face for body and UI -->
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Fonts -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap"
-        rel="stylesheet" />
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bbc: {
+                            black: '#141414',
+                            darkGray: '#222222',
+                            lightGray: '#f5f5f5',
+                            border: '#e5e5e5',
+                            tag: '#555555',
+                            accent: '#a4ea64' // Natbios Green
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-        /* ====================================================================
-           DESIGN TOKENS
-           Palette: near-black canvas, deep violet signature, warm off-white text
-           Signature element: full-bleed cinematic hero with diagonal text crop
-        ==================================================================== */
-        :root {
-            /* Core palette */
-            --ink: #09090f;
-            /* Deepest black — canvas */
-            --ink-2: #111119;
-            /* Card backgrounds */
-            --ink-3: #1a1a27;
-            /* Elevated surfaces */
-            --border: #ffffff0f;
-            /* Ghost borders */
-            --border-lit: #ffffff1a;
-            /* Lit borders on hover */
-
-            /* Violet signature */
-            --violet: #3a7c4c;
-            /* Primary accent */
-            --violet-mid: #4ba05b;
-            /* Mid — gradients */
-            --violet-pale: #4ba05b;
-            /* Text on dark — readable */
-            --violet-glow: #fff;
-            /* Ambient glow */
-
-            /* Text */
-            --chalk: #f0eef8;
-            /* Primary text — cool white */
-            --chalk-2: #a09dba;
-            /* Secondary — muted */
-            --chalk-3: #5c5975;
-            /* Tertiary — very muted */
-
-            /* Type */
-            --font-display: 'Cormorant Garamond', Georgia, serif;
-            --font-body: 'DM Sans', system-ui, sans-serif;
-
-            /* Spacing */
-            --gap: clamp(48px, 8vw, 120px);
-            --radius: 2px;
-            /* Almost no radius — sharp, editorial */
+        .hero-slides,
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
         }
 
-        /* ====================================================================
-           RESET
-        ==================================================================== */
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        .hero-slide {
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
         }
 
-        html {
-            scroll-behavior: smooth;
+        .hero-slide.active {
+            opacity: 0.7;
         }
 
         body {
-            font-family: var(--font-body);
-            background-color: var(--ink);
-            color: var(--chalk);
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
+            background-color: #ffffff;
+            color: #141414;
         }
 
-        img {
-            display: block;
-            max-width: 100%;
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        button {
-            font-family: var(--font-body);
-            cursor: pointer;
-            border: none;
-            background: none;
-        }
-
-        /* ====================================================================
-           NAVIGATION
-        ==================================================================== */
-        .nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 clamp(24px, 5vw, 64px);
-            height: 72px;
-            background: linear-gradient(to bottom, rgba(9, 9, 15, .95), transparent);
-            backdrop-filter: blur(0px);
-            transition: backdrop-filter 400ms ease, background 400ms ease;
-        }
-
-        .nav.scrolled {
-            background: rgba(9, 9, 15, .92);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .nav__logo {
-            font-family: var(--font-display);
-            font-size: 1.5rem;
-            font-weight: 400;
-            letter-spacing: 0.04em;
-            color: var(--chalk);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav__logo em {
-            font-style: italic;
-            color: var(--violet-pale);
-        }
-
-        .nav__links {
-            display: flex;
-            align-items: center;
-            gap: 32px;
-        }
-
-        .nav__link {
-            font-size: 0.78rem;
-            font-weight: 400;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--chalk-2);
-            transition: color 200ms ease;
-        }
-
-        .nav__link:hover {
-            color: var(--chalk);
-        }
-
-        .nav__cta {
-            padding: 10px 22px;
-            border: 1px solid var(--violet);
-            color: var(--violet-pale);
-            font-size: 0.78rem;
-            font-weight: 500;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            transition: background 200ms ease, color 200ms ease;
-        }
-
-        .nav__cta:hover {
-            background: var(--violet);
-            color: #fff;
-        }
-
-        .nav__hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-        }
-
-        .nav__hamburger span {
-            display: block;
-            width: 24px;
-            height: 1px;
-            background: var(--chalk);
-            transition: all 200ms;
-        }
-
-        /* ====================================================================
-           HERO — Cinematic full-bleed with diagonal image split
-           Signature element: the giant italic serif overlapping a photo crop
-        ==================================================================== */
-        .hero {
-            position: relative;
-            height: 100svh;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        /* Premium Image Hover Effects */
+        .img-zoom-container {
             overflow: hidden;
-        }
-
-        /* Left: text panel */
-        .hero__text {
             position: relative;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 120px clamp(24px, 5vw, 80px) 80px;
         }
 
-        .hero__eyebrow {
-            font-size: 0.68rem;
-            font-weight: 500;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--violet-pale);
-            margin-bottom: 28px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .img-zoom {
+            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        .hero__eyebrow::before {
-            content: '';
-            display: block;
-            width: 40px;
-            height: 1px;
-            background: var(--violet);
+        .group:hover .img-zoom {
+            transform: scale(1.05);
         }
 
-        .hero__title {
-            font-family: var(--font-display);
-            font-size: clamp(3rem, 6vw, 5.5rem);
-            font-weight: 300;
-            line-height: 1.0;
-            color: var(--chalk);
-            margin-bottom: 32px;
-        }
-
-        .hero__title em {
-            font-style: italic;
-            color: var(--violet-pale);
-            display: block;
-        }
-
-        .hero__sub {
-            font-size: clamp(0.88rem, 1.2vw, 1rem);
-            font-weight: 300;
-            line-height: 1.7;
-            color: var(--chalk-2);
-            max-width: 420px;
-            margin-bottom: 48px;
-        }
-
-        .hero__actions {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .btn-primary {
-            padding: 14px 36px;
-            background: var(--violet);
-            color: #fff;
-            font-size: 0.82rem;
-            font-weight: 500;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            transition: background 200ms ease, transform 150ms ease;
-        }
-
-        .btn-primary:hover {
-            background: #3f9549;
-            transform: translateY(-1px);
-        }
-
-        .btn-ghost {
-            padding: 14px 36px;
-            border: 1px solid var(--border-lit);
-            color: var(--chalk-2);
-            font-size: 0.82rem;
-            font-weight: 400;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            transition: border-color 200ms ease, color 200ms ease;
-        }
-
-        .btn-ghost:hover {
-            border-color: var(--chalk-2);
-            color: var(--chalk);
-        }
-
-        /* Hero stats strip */
-        .hero__stats {
-            display: flex;
-            gap: 40px;
-            margin-top: 64px;
-            padding-top: 40px;
-            border-top: 1px solid var(--border);
-        }
-
-        .hero__stat-num {
-            font-family: var(--font-display);
-            font-size: 2rem;
-            font-weight: 300;
-            color: var(--chalk);
-            line-height: 1;
-        }
-
-        .hero__stat-label {
-            font-size: 0.72rem;
-            color: var(--chalk-3);
-            margin-top: 4px;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-        /* Right: image panel */
-        .hero__image-panel {
+        /* Muted YouTube previews appear only while a showcase is hovered. */
+        .showcase-player {
             position: absolute;
             inset: 0;
-            overflow: hidden;
-            z-index: 0;
-        }
-
-        /* Diagonal clip — the signature visual */
-        .hero__image-panel::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, rgba(9, 9, 15, .98) 0%, rgba(9, 9, 15, .92) 42%, rgba(9, 9, 15, .42) 68%, rgba(9, 9, 15, .15) 100%);
-            z-index: 2;
+            z-index: 1;
             pointer-events: none;
         }
 
-        .hero__image-panel::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to bottom,
-                    rgba(9, 9, 15, .5) 0%,
-                    transparent 40%,
-                    rgba(9, 9, 15, .7) 100%);
-            z-index: 1;
-        }
-
-        /* Full-height wildlife photo slideshow */
-        .hero__slideshow {
-            position: absolute;
-            inset: 0;
-        }
-
-        .hero__slide {
-            position: absolute;
-            inset: 0;
+        .showcase-player iframe {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            object-position: center;
-            opacity: 0;
-            transition: opacity 900ms ease-in-out, transform 4s ease-out;
-            transform: scale(1.04);
+            border: 0;
         }
 
-        .hero__slide.is-active {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        /* The oversized italic word that bleeds across both panels — the signature */
-        .hero__bleed-word {
-            position: absolute;
-            bottom: 60px;
-            right: -20px;
-            font-family: var(--font-display);
-            font-style: italic;
-            font-weight: 300;
-            font-size: clamp(5rem, 12vw, 11rem);
-            color: transparent;
-            -webkit-text-stroke: 1px rgba(168, 85, 247, 0.25);
-            letter-spacing: -0.02em;
-            line-height: 1;
-            pointer-events: none;
-            z-index: 3;
-            user-select: none;
-            white-space: nowrap;
-        }
-
-        /* ====================================================================
-           MARQUEE STRIP
-        ==================================================================== */
-        .marquee-strip {
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 0;
-            overflow: hidden;
-            background: var(--ink-2);
-        }
-
-        .marquee-track {
-            display: flex;
-            gap: 48px;
-            animation: marquee 28s linear infinite;
-            width: max-content;
-        }
-
-        .marquee-item {
-            font-size: 0.68rem;
-            font-weight: 400;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--chalk-3);
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 48px;
-        }
-
-        .marquee-item::after {
-            content: '◆';
-            font-size: 0.45rem;
-            color: var(--violet);
-        }
-
-        @keyframes marquee {
-            from {
-                transform: translateX(0);
-            }
-
-            to {
-                transform: translateX(-50%);
-            }
-        }
-
-        /* ====================================================================
-           SECTION COMMON
-        ==================================================================== */
-        .section {
-            padding: var(--gap) clamp(24px, 5vw, 80px);
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .section-label {
-            font-size: 0.65rem;
-            font-weight: 500;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--violet-pale);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .section-label::before {
-            content: '';
-            display: block;
-            width: 32px;
-            height: 1px;
-            background: var(--violet);
-        }
-
-        .section-title {
-            font-family: var(--font-display);
-            font-size: clamp(2rem, 4vw, 3.5rem);
-            font-weight: 300;
-            line-height: 1.1;
-            color: var(--chalk);
-            margin-bottom: 20px;
-        }
-
-        .section-title em {
-            font-style: italic;
-            color: var(--violet-pale);
-        }
-
-        .section-sub {
-            font-size: 0.9rem;
-            font-weight: 300;
-            line-height: 1.7;
-            color: var(--chalk-2);
-            max-width: 520px;
-        }
-
-        /* ====================================================================
-           COLLECTIONS — 3 editorial cards in asymmetric layout
-        ==================================================================== */
-        .collections {
-            padding: var(--gap) clamp(24px, 5vw, 80px);
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .collections__header {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            margin-bottom: 48px;
-            gap: 24px;
-        }
-
-        .collections__grid {
-            display: grid;
-            grid-template-columns: 1.4fr 1fr 1fr;
-            grid-template-rows: 380px 240px;
-            gap: 4px;
-        }
-
-        .col-card {
-            position: relative;
-            overflow: hidden;
-            background: var(--ink-3);
-            cursor: pointer;
-        }
-
-        /* Span first card across both rows */
-        .col-card:first-child {
-            grid-row: 1 / 3;
-        }
-
-        /* Real photography for the collections */
-        .col-card {
-            background-position: center;
-            background-size: cover;
-            transition: background-size 400ms ease;
-        }
-
-        .col-card:hover {
-            background-size: 108%;
-        }
-
-        .col-card:nth-child(1) {
-            background-image: url('https://images.unsplash.com/photo-1549366021-9f761d450615?auto=format&fit=crop&w=1400&q=85');
-        }
-
-        .col-card:nth-child(2) {
-            background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=85');
-        }
-
-        .col-card:nth-child(3) {
-            background-image: url('https://images.unsplash.com/photo-1544550285-f813152fb2fd?auto=format&fit=crop&w=1200&q=85');
-        }
-
-        .col-card:nth-child(4) {
-            background-image: url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=85');
-        }
-
-        .col-card:nth-child(5) {
-            background-image: url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=85');
-        }
-
-        .col-card__overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(9, 9, 15, .85) 0%, transparent 55%);
-            opacity: 0;
-            transition: opacity 300ms ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 24px;
-        }
-
-        .col-card:hover .col-card__overlay {
+        .showcase-card:hover .showcase-overlay {
             opacity: 1;
         }
 
-        /* Violet corner accent — appears on hover */
-        .col-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 3px;
-            height: 0;
-            background: var(--violet);
-            transition: height 300ms ease;
+        .showcase-overlay {
+            z-index: 2;
         }
 
-        .col-card:hover::after {
-            height: 100%;
-        }
-
-        .col-card__tag {
-            font-size: 0.65rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--violet-pale);
-            margin-bottom: 6px;
-        }
-
-        .col-card__title {
-            font-family: var(--font-display);
-            font-size: 1.4rem;
-            font-weight: 400;
-            color: var(--chalk);
-        }
-
-        .col-card__count {
-            font-size: 0.72rem;
-            color: var(--chalk-3);
-            margin-top: 4px;
-        }
-
-        /* ====================================================================
-           HOW IT WORKS — horizontal process strip
-        ==================================================================== */
-        .process {
-            padding: var(--gap) clamp(24px, 5vw, 80px);
-            background: var(--ink-2);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .process__inner {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .process__steps {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1px;
-            margin-top: 56px;
-            background: var(--border);
-        }
-
-        .process__step {
-            background: var(--ink-2);
-            padding: 40px 36px;
+        /* Elegant Title Underline on Hover */
+        .title-hover {
             position: relative;
+            display: inline-block;
         }
 
-        .process__step-num {
-            font-family: var(--font-display);
-            font-size: 3.5rem;
-            font-weight: 300;
-            color: var(--border-lit);
-            line-height: 1;
-            margin-bottom: 20px;
-            transition: color 300ms ease;
-        }
-
-        .process__step:hover .process__step-num {
-            color: var(--violet-glow);
-        }
-
-        .process__step-title {
-            font-family: var(--font-display);
-            font-size: 1.3rem;
-            font-weight: 400;
-            color: var(--chalk);
-            margin-bottom: 12px;
-        }
-
-        .process__step-body {
-            font-size: 0.85rem;
-            font-weight: 300;
-            line-height: 1.7;
-            color: var(--chalk-2);
-        }
-
-        /* Violet bottom border on hover */
-        .process__step::after {
+        .title-hover::after {
             content: '';
             position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 2px;
             bottom: 0;
             left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--violet);
-            transition: width 350ms ease;
+            background-color: #141414;
+            transform-origin: bottom right;
+            transition: transform 0.25s ease-out;
         }
 
-        .process__step:hover::after {
+        .group:hover .title-hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        /* Video Background Utilities */
+        .video-bg-container {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-        }
-
-        /* ====================================================================
-           FEATURED ASSET — full-bleed editorial spotlight
-        ==================================================================== */
-        .featured {
-            padding: var(--gap) clamp(24px, 5vw, 80px);
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .featured__inner {
-            display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 4px;
-            min-height: 520px;
-        }
-
-        .featured__image {
-            background: linear-gradient(145deg, #0d0d1f 0%, #1a0f35 30%, #2d1b50 55%, #110a2d 80%, #0a0a14 100%);
-            position: relative;
+            height: 100%;
             overflow: hidden;
-        }
-
-        .featured__image::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at 70% 50%, rgba(124, 58, 237, .12) 0%, transparent 65%);
-        }
-
-        .featured__info {
-            background: var(--ink-3);
-            padding: 48px 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            border-left: 1px solid var(--border);
-        }
-
-        .featured__category {
-            font-size: 0.65rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--violet-pale);
-        }
-
-        .featured__title {
-            font-family: var(--font-display);
-            font-size: 2.2rem;
-            font-weight: 300;
-            line-height: 1.15;
-            color: var(--chalk);
-            margin: 16px 0;
-        }
-
-        .featured__title em {
-            font-style: italic;
-        }
-
-        .featured__meta {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .featured__meta-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.78rem;
-            color: var(--chalk-3);
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .featured__meta-row span:last-child {
-            color: var(--chalk-2);
-        }
-
-        .featured__price {
-            font-family: var(--font-display);
-            font-size: 2.8rem;
-            font-weight: 300;
-            color: var(--chalk);
-        }
-
-        .featured__price sup {
-            font-family: var(--font-body);
-            font-size: 1rem;
-            vertical-align: super;
-            color: var(--chalk-2);
-        }
-
-        .featured__cta {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .btn-violet {
-            padding: 14px 24px;
-            background: var(--violet);
-            color: #fff;
-            font-size: 0.8rem;
-            font-weight: 500;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            text-align: center;
-            transition: background 200ms ease;
-            display: block;
-        }
-
-        .btn-violet:hover {
-            background: #6d28d9;
-        }
-
-        .btn-outline-sm {
-            padding: 14px 24px;
-            border: 1px solid var(--border-lit);
-            color: var(--chalk-2);
-            font-size: 0.78rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            text-align: center;
-            transition: border-color 200ms ease, color 200ms ease;
-            display: block;
-        }
-
-        .btn-outline-sm:hover {
-            border-color: var(--chalk-3);
-            color: var(--chalk);
-        }
-
-        /* ====================================================================
-           TESTIMONIAL / TRUST
-        ==================================================================== */
-        .trust {
-            padding: var(--gap) clamp(24px, 5vw, 80px);
-            background: var(--ink-2);
-            border-top: 1px solid var(--border);
-        }
-
-        .trust__inner {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            align-items: center;
-        }
-
-        .trust__quote {
-            font-family: var(--font-display);
-            font-size: clamp(1.4rem, 2.5vw, 2rem);
-            font-weight: 300;
-            font-style: italic;
-            line-height: 1.4;
-            color: var(--chalk);
-        }
-
-        .trust__quote::before {
-            content: open-quote;
-            color: var(--violet);
-            font-size: 3rem;
-            line-height: 0;
-            vertical-align: -0.5rem;
-            margin-right: 4px;
-        }
-
-        .trust__author {
-            margin-top: 24px;
-            font-size: 0.78rem;
-            color: var(--chalk-3);
-            letter-spacing: 0.08em;
-        }
-
-        .trust__author strong {
-            color: var(--chalk-2);
-        }
-
-        .trust__numbers {
-            display: flex;
-            flex-direction: column;
-            gap: 32px;
-        }
-
-        .trust__number-item {
-            display: flex;
-            align-items: baseline;
-            gap: 16px;
-            padding-bottom: 32px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .trust__number-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .trust__big-num {
-            font-family: var(--font-display);
-            font-size: 3rem;
-            font-weight: 300;
-            color: var(--chalk);
-            line-height: 1;
-        }
-
-        .trust__num-label {
-            font-size: 0.8rem;
-            font-weight: 300;
-            color: var(--chalk-2);
-            line-height: 1.5;
-        }
-
-        /* ====================================================================
-           CTA BANNER
-        ==================================================================== */
-        .cta-banner {
-            padding: var(--gap) clamp(24px, 5vw, 80px);
-            position: relative;
-            overflow: hidden;
-            text-align: center;
-        }
-
-        .cta-banner::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at 50% 50%, rgba(124, 58, 237, .15) 0%, transparent 65%);
-            pointer-events: none;
-        }
-
-        .cta-banner__inner {
-            max-width: 680px;
-            margin: 0 auto;
-            position: relative;
             z-index: 1;
+            background-color: #141414;
         }
 
-        .cta-banner__title {
-            font-family: var(--font-display);
-            font-size: clamp(2rem, 4vw, 3.5rem);
-            font-weight: 300;
-            line-height: 1.1;
-            color: var(--chalk);
-            margin-bottom: 20px;
+        .video-bg {
+            min-width: 100%;
+            min-height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.7;
         }
 
-        .cta-banner__title em {
-            font-style: italic;
-            color: var(--violet-pale);
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .cta-banner__sub {
-            font-size: 0.9rem;
-            font-weight: 300;
-            color: var(--chalk-2);
-            line-height: 1.7;
-            margin-bottom: 40px;
+        ::-webkit-scrollbar-track {
+            background: #f5f5f5;
         }
 
-        .cta-banner__actions {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            flex-wrap: wrap;
+        ::-webkit-scrollbar-thumb {
+            background: #888;
         }
 
-        /* ====================================================================
-           ABOUT & CONTACT
-        ==================================================================== */
-        .about-contact {
-            padding: var(--gap) clamp(24px, 5vw, 80px);
-            background: var(--ink-2);
-            border-top: 1px solid var(--border);
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
 
-        .about-contact__grid {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: clamp(40px, 8vw, 140px);
+        /* Mobile Menu Animations */
+        #mobile-menu {
+            transition: all 0.3s ease-in-out;
+            transform-origin: top;
         }
 
-        #about,
-        #contact {
-            scroll-margin-top: 100px;
-        }
-
-        .about-contact__body {
-            max-width: 520px;
-            color: var(--chalk-2);
-            font-size: 0.95rem;
-            font-weight: 300;
-            line-height: 1.8;
-            margin-top: 24px;
-        }
-
-        .contact-link {
-            display: inline-block;
-            margin-top: 28px;
-            color: var(--violet-pale);
-            font-family: var(--font-display);
-            font-size: clamp(1.5rem, 2.5vw, 2.25rem);
-            font-weight: 300;
-            border-bottom: 1px solid var(--violet);
-            transition: color 200ms ease, border-color 200ms ease;
-        }
-
-        .contact-link:hover {
-            color: var(--chalk);
-            border-color: var(--chalk);
-        }
-
-        /* ====================================================================
-           FOOTER
-        ==================================================================== */
-        .footer {
-            border-top: 1px solid var(--border);
-            padding: 48px clamp(24px, 5vw, 80px);
-            background: var(--ink);
-        }
-
-        .footer__inner {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 24px;
-            flex-wrap: wrap;
-        }
-
-        .footer__logo {
-            font-family: var(--font-display);
-            font-size: 1.2rem;
-            font-weight: 400;
-            color: var(--chalk-3);
-        }
-
-        .footer__logo em {
-            font-style: italic;
-            color: var(--violet-pale);
-        }
-
-        .footer__links {
-            display: flex;
-            gap: 32px;
-        }
-
-        .footer__link {
-            font-size: 0.72rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--chalk-3);
-            transition: color 200ms ease;
-        }
-
-        .footer__link:hover {
-            color: var(--chalk-2);
-        }
-
-        .footer__copy {
-            font-size: 0.72rem;
-            color: var(--chalk-3);
-        }
-
-        /* ====================================================================
-           SCROLL REVEAL — subtle fade-up on section entry
-        ==================================================================== */
-        .reveal {
+        #mobile-menu.hidden {
+            transform: scaleY(0);
             opacity: 0;
-            transform: translateY(28px);
-            transition: opacity 700ms ease, transform 700ms ease;
+            display: none;
         }
 
-        .reveal.visible {
+        #mobile-menu.flex {
+            transform: scaleY(1);
             opacity: 1;
+        }
+
+        /* Custom Pop-up Notification (Replaces alerts) */
+        #notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            transform: translateY(150%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        #notification.show {
             transform: translateY(0);
-        }
-
-        .reveal-delay-1 {
-            transition-delay: 100ms;
-        }
-
-        .reveal-delay-2 {
-            transition-delay: 200ms;
-        }
-
-        .reveal-delay-3 {
-            transition-delay: 320ms;
-        }
-
-        /* ====================================================================
-           RESPONSIVE
-        ==================================================================== */
-        @media (max-width: 900px) {
-            .hero {
-                height: auto;
-                min-height: 100svh;
-            }
-
-            .hero__image-panel {
-                height: auto;
-            }
-
-            .hero__bleed-word {
-                font-size: 4rem;
-                bottom: 20px;
-            }
-
-            .collections__grid {
-                grid-template-columns: 1fr 1fr;
-                grid-template-rows: auto;
-            }
-
-            .col-card:first-child {
-                grid-row: auto;
-            }
-
-            .col-card {
-                min-height: 220px;
-            }
-
-            .process__steps {
-                grid-template-columns: 1fr;
-            }
-
-            .featured__inner {
-                grid-template-columns: 1fr;
-            }
-
-            .trust__inner {
-                grid-template-columns: 1fr;
-                gap: 48px;
-            }
-
-            .about-contact__grid {
-                grid-template-columns: 1fr;
-                gap: 56px;
-            }
-
-            .nav__links {
-                display: none;
-            }
-
-            .nav__hamburger {
-                display: flex;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .hero__stats {
-                gap: 24px;
-                flex-wrap: wrap;
-            }
-
-            .collections__grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-height: 800px) and (min-width: 901px) {
-            .hero__text {
-                padding-top: 96px;
-                padding-bottom: 40px;
-            }
-
-            .hero__eyebrow {
-                margin-bottom: 18px;
-            }
-
-            .hero__title {
-                font-size: clamp(3rem, 5vw, 4.3rem);
-                margin-bottom: 20px;
-            }
-
-            .hero__sub {
-                margin-bottom: 28px;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-
-            *,
-            *::before,
-            *::after {
-                animation-duration: 0.01ms !important;
-                transition-duration: 0.01ms !important;
-            }
-
-            .reveal {
-                opacity: 1;
-                transform: none;
-            }
         }
     </style>
 </head>
 
-<body>
+<body class="font-sans antialiased selection:bg-black selection:text-white">
 
-    <!-- =====================================================================
-     NAVIGATION
-====================================================================== -->
-    <nav class="nav" id="main-nav">
-        <a href="/" class="nav__logo">
-            <img src="natbioslogog.png" alt="Natbios" height="32" style="vertical-align:middle;" />
-            <span> Stock</span>
-        </a>
-        <div class="nav__links">
-            <a href="#collections" class="nav__link">Collections</a>
-            <a href="#how-it-works" class="nav__link">Licensing</a>
-            <a href="#" class="nav__link">Photographers</a>
-            <a href="#about" class="nav__link">About</a>
-            <a href="#contact" class="nav__link">Contact</a>
-            <a href="gallery.html" class="nav__cta">Browse Library</a>
+    <!-- 1. TOP NAVIGATION -->
+    <nav class="sticky top-0 z-[100] bg-white border-b border-bbc-border transition-all duration-300" id="navbar">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+            <div class="flex justify-between items-center h-16 md:h-20">
+
+                <!-- Logo -->
+                <a href="#home" class="flex items-center gap-3" aria-label="Go to Home">
+                    <span
+                        class="items-center font-sans font-black text-2xl md:text-3xl tracking-tight uppercase border-l-4 border-black pl-2">
+                        N<span class="text-bbc-accent">A</span>TBIOS
+                    </span>
+                </a>
+
+                <!-- Desktop Links -->
+                <div
+                    class="hidden lg:flex space-x-6 xl:space-x-8 items-center text-[12px] xl:text-[13px] font-bold uppercase tracking-wider text-bbc-darkGray h-full">
+
+                    <!-- Animals Dropdown -->
+                    <div class="group relative h-full flex items-center">
+                        <a href="#animals"
+                            class="hover:text-black hover:underline transition py-6 inline-flex items-center">
+                            Animals <i class="fas fa-chevron-down text-[10px] ml-1.5 opacity-50"></i>
+                        </a>
+                        <div
+                            class="absolute top-[100%] left-0 bg-white border border-bbc-border shadow-xl min-w-[240px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 flex flex-col z-[110]">
+                            <a href="#species-index"
+                                class="px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition text-xs font-bold text-gray-700 hover:text-black">Species
+                                Database</a>
+                            <a href="#animals"
+                                class="px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition text-xs font-bold text-gray-700 hover:text-black">Mammals</a>
+                            <a href="#animals"
+                                class="px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition text-xs font-bold text-gray-700 hover:text-black">Birds</a>
+                            <a href="#animals"
+                                class="px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition text-xs font-bold text-gray-700 hover:text-black">Amphibians
+                                & Reptiles</a>
+                        </div>
+                    </div>
+
+                    <a href="#nature" class="hover:text-black hover:underline transition">Nature</a>
+                    <a href="#masterplan"
+                        class="hover:text-black transition text-black border-b-2 border-transparent hover:border-black py-6">Master
+                        Plan</a>
+                    <a href="#expeditions" class="hover:text-black hover:underline transition">Expeditions</a>
+                    <a href="#articles" class="hover:text-black hover:underline transition">Field Notes</a>
+
+                    <!-- More Dropdown -->
+                    <div class="group relative h-full flex items-center">
+                        <a href="#b2b"
+                            class="hover:text-black hover:underline transition py-6 inline-flex items-center">
+                            More <i class="fas fa-chevron-down text-[10px] ml-1.5 opacity-50"></i>
+                        </a>
+                        <div
+                            class="absolute top-[100%] right-0 bg-white border border-bbc-border shadow-xl min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 flex flex-col z-[110]">
+                            <a href="#films"
+                                class="px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition text-xs font-bold text-gray-700 hover:text-black">Films
+                                & Showreels</a>
+                            <a href="#restoration"
+                                class="px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition text-xs font-bold text-gray-700 hover:text-black">Sustainability</a>
+                            <a href="#team"
+                                class="px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition text-xs font-bold text-gray-700 hover:text-black">Our
+                                Team</a>
+                            <a href="#shop"
+                                class="px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition text-xs font-bold text-gray-700 hover:text-black">The
+                                Store</a>
+                            <a href="#careers"
+                                class="px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition text-xs font-bold text-gray-700 hover:text-black">Careers</a>
+                            <a href="#archive"
+                                class="px-6 py-4 hover:bg-gray-50 transition text-xs font-bold text-gray-700 hover:text-black">Stock
+                                Archive</a>
+                        </div>
+                    </div>
+
+                    <button class="ml-2 text-lg hover:text-black transition" aria-label="Search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="lg:hidden flex items-center gap-5 text-bbc-darkGray">
+                    <button class="text-xl hover:text-black transition" aria-label="Search"><i
+                            class="fas fa-search"></i></button>
+                    <button onclick="toggleMobileMenu()" class="text-xl cursor-pointer" aria-label="Toggle Menu"><i
+                            class="fas fa-bars"></i></button>
+                </div>
+            </div>
         </div>
-        <div class="nav__hamburger" id="hamburger" aria-label="Open menu">
-            <span></span><span></span><span></span>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu"
+            class="hidden flex-col bg-white border-t border-bbc-border absolute w-full left-0 shadow-2xl h-[80vh] overflow-y-auto">
+            <a href="#animals" onclick="toggleMobileMenu()"
+                class="px-6 py-4 border-b border-gray-100 text-[13px] font-bold uppercase tracking-wider text-bbc-darkGray hover:bg-gray-50">Animals
+                & Species</a>
+            <a href="#nature" onclick="toggleMobileMenu()"
+                class="px-6 py-4 border-b border-gray-100 text-[13px] font-bold uppercase tracking-wider text-bbc-darkGray hover:bg-gray-50">Nature
+                Habitats</a>
+            <a href="#masterplan" onclick="toggleMobileMenu()"
+                class="px-6 py-4 border-b border-gray-100 text-[13px] font-bold uppercase tracking-wider text-black bg-gray-50">Master
+                Plan</a>
+            <a href="#expeditions" onclick="toggleMobileMenu()"
+                class="px-6 py-4 border-b border-gray-100 text-[13px] font-bold uppercase tracking-wider text-bbc-darkGray hover:bg-gray-50">Expeditions</a>
+            <a href="#articles" onclick="toggleMobileMenu()"
+                class="px-6 py-4 border-b border-gray-100 text-[13px] font-bold uppercase tracking-wider text-bbc-darkGray hover:bg-gray-50">Field
+                Notes</a>
+            <div class="px-6 py-5 bg-gray-50">
+                <span class="text-[11px] font-bold uppercase tracking-widest text-gray-400 block mb-4">More</span>
+                <div class="pl-4 flex flex-col space-y-4">
+                    <a href="#films" onclick="toggleMobileMenu()"
+                        class="text-[11px] font-bold uppercase tracking-widest text-bbc-darkGray hover:text-black">Films
+                        & Shows</a>
+                    <a href="#shop" onclick="toggleMobileMenu()"
+                        class="text-[11px] font-bold uppercase tracking-widest text-bbc-darkGray hover:text-black">Shop</a>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <!-- =====================================================================
-     HERO
-====================================================================== -->
-    <section class="hero" aria-label="Hero">
-        <!-- Left: copy -->
-        <div class="hero__text">
-            <p class="hero__eyebrow">Nature · Wildlife · 4K Video</p>
+    <!-- 2. HERO: CINEMATIC ENTRY -->
+    <section id="home" class="relative h-[80vh] md:h-[90vh] w-full flex items-end pb-12 md:pb-24 overflow-hidden">
+        <!-- Video Background -->
+        <div class="video-bg-container">
+            <div class="hero-slides" aria-hidden="true">
+                <img class="hero-slide active" src="asset/hero/himalayas.JPG" alt="">
 
-            <h1 class="hero__title">
-                License world&#8209;class
-                <em>nature & wildlife</em>
-                for your work.
-            </h1>
+                <img class="hero-slide" src="asset/hero/mountain_fire.jpg" alt="" loading="lazy">
 
-            <p class="hero__sub">
-                Thousands of premium photos and 4K videos — shot by independent wildlife photographers across six
-                continents. Priced fairly. Licensed clearly.
-            </p>
+                <img class="hero-slide" src="asset/hero/couplebird2.JPG" alt="" loading="lazy">
 
-            <div class="hero__actions">
-                <a href="gallery.html" class="btn-primary">Explore the library</a>
-                <a href="dashboard.html" class="btn-ghost">Upload & sell</a>
+                <img class="hero-slide" src="asset/hero/moon.JPG" alt="" loading="lazy">
+                <img class="hero-slide" src="asset/hero/bird3.jpg" </div>
+                <!-- Gradient Overlay for Readability -->
+                <div class="absolute inset-0 bg-gradient-to-t from-[#050B14] via-black/40 to-transparent"></div>
             </div>
 
-        </div>
-
-        <!-- Right: real wildlife photography slideshow -->
-        <div class="hero__image-panel" aria-hidden="true">
-            <div class="hero__slideshow">
-                <img class="hero__slide is-active"
-                    src="https://images.unsplash.com/photo-1549366021-9f761d450615?auto=format&amp;fit=crop&amp;w=1600&amp;q=85"
-                    alt="">
-                <img class="hero__slide"
-                    src="https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?auto=format&amp;fit=crop&amp;w=1600&amp;q=85"
-                    alt="">
-                <img class="hero__slide"
-                    src="https://images.unsplash.com/photo-1535338454770-8be927b5a00b?auto=format&amp;fit=crop&amp;w=1600&amp;q=85"
-                    alt="">
+            <div class="relative z-10 max-w-[1400px] mx-auto w-full px-4 lg:px-8">
+                <div class="max-w-3xl">
+                    <span class="text-bbc-accent text-[11px] font-bold uppercase tracking-[0.3em] mt-4 mb-4 block">Natbios
+                        Productions</span>
+                    <h1 class="font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-4">
+                        Buying Back The Earth.
+                    </h1>
+                    <p class="text-lg text-gray-200 font-light mb-8 max-w-xl">
+                        Home to India's most immersive documentary library, cinematic showreels, and the largest 4K
+                        stock
+                        archive of Eastern India's biodiversity.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="#films"
+                            class="inline-block bg-bbc-accent text-black font-bold uppercase tracking-widest text-[13px] px-8 py-4 hover:bg-white transition">
+                            View Showreels
+                        </a>
+                        <a href="#masterplan"
+                            class="inline-block border border-white text-white font-bold uppercase tracking-widest text-[13px] px-8 py-4 hover:bg-white hover:text-black transition">
+                            Explore Master Plan
+                        </a>
+                    </div>
+                </div>
             </div>
-            <!-- Signature bleed word -->
-            <span class="hero__bleed-word">Wildlife</span>
-        </div>
     </section>
 
-    <!-- =====================================================================
-     MARQUEE
-====================================================================== -->
-    <div class="marquee-strip" aria-hidden="true">
-        <div class="marquee-track">
-            <!-- Duplicated for seamless loop -->
-            <span class="marquee-item">Wildlife Photography</span>
-            <span class="marquee-item">4K Video Footage</span>
-            <span class="marquee-item">Standard License</span>
-            <span class="marquee-item">Extended License</span>
-            <span class="marquee-item">Editorial Use</span>
-            <span class="marquee-item">RAW Files Available</span>
-            <span class="marquee-item">Instant Download</span>
-            <span class="marquee-item">Wildlife Photography</span>
-            <span class="marquee-item">4K Video Footage</span>
-            <span class="marquee-item">Standard License</span>
-            <span class="marquee-item">Extended License</span>
-            <span class="marquee-item">Editorial Use</span>
-            <span class="marquee-item">RAW Files Available</span>
-            <span class="marquee-item">Instant Download</span>
-        </div>
+    <!-- 3. MOTTO BAR -->
+    <div class="bg-black text-white text-center py-16 px-6 border-b border-gray-800">
+        <h2 class="font-serif text-3xl md:text-4xl font-bold">"We must give more than we take."</h2>
+        <p class="text-gray-400 mt-4 max-w-2xl mx-auto font-light">Award-winning environmental documentaries, immersive
+            nature tours, and relentless habitat protection from Patna, Bihar.</p>
     </div>
 
-    <!-- =====================================================================
-     COLLECTIONS
-====================================================================== -->
-    <section class="collections" id="collections">
-        <div class="collections__header reveal">
+    <!-- 4. SHOWCASES / YOUTUBE VIDEOS -->
+    <section id="films" class="py-16 md:py-24 max-w-[1400px] mx-auto px-4 lg:px-8">
+        <div class="flex justify-between items-baseline mb-8">
             <div>
-                <p class="section-label">Browse by collection</p>
-                <h2 class="section-title">Every habitat.<br><em>Every species.</em></h2>
+                <h2 class="font-serif text-3xl font-bold mb-2">Showcases</h2>
+                <p class="text-gray-500 font-light text-sm">Watch NATBIOS documentaries, showreels, and field stories on YouTube.
+                </p>
             </div>
-            <a href="gallery.html" class="btn-ghost reveal reveal-delay-1">View all collections →</a>
+            <a href="https://www.youtube.com/@Natbiosindia" target="_blank" rel="noopener"
+                class="hidden md:block text-[13px] font-bold uppercase tracking-wider border-b border-black pb-0.5 hover:text-gray-600 transition">Watch
+                Featured Video</a>
         </div>
 
-        <div class="collections__grid reveal reveal-delay-2">
-            <div class="col-card">
-                <div class="col-card__overlay">
-                    <p class="col-card__tag">Featured collection</p>
-                    <h3 class="col-card__title">Predators in Motion</h3>
-                    <p class="col-card__count">340 assets · From $12</p>
+        <div class="flex overflow-x-auto md:grid md:grid-cols-4 gap-6 pb-8 md:pb-0 snap-x">
+            <!-- Main Doc -->
+            <a href="https://youtu.be/1vkpFnvKKvc?si=8UCtA-9TC9bu17I3" target="_blank" rel="noopener" data-video-id="1vkpFnvKKvc" class="showcase-card group block min-w-[280px] md:min-w-0 snap-start">
+                <div class="showcase-media img-zoom-container aspect-[16/9] mb-4 bg-gray-100">
+                    <img src="https://i.ytimg.com/vi/1vkpFnvKKvc/hqdefault.jpg"
+                        loading="lazy" class="img-zoom w-full h-full object-cover" alt="Film">
+                    <div
+                        class="showcase-overlay absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 transition duration-300">
+                        <i class="fas fa-play-circle text-4xl text-white"></i>
+                    </div>
+                </div>
+                <span class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Watch on YouTube</span>
+                <h3 class="font-sans text-xl font-bold title-hover leading-tight">The Unseen India</h3>
+            </a>
+
+            <!-- Showreel -->
+            <a href="https://youtu.be/pWbGg5kAuhs" target="_blank" rel="noopener" data-video-id="pWbGg5kAuhs" class="showcase-card group block min-w-[280px] md:min-w-0 snap-start">
+                <div class="showcase-media img-zoom-container aspect-[16/9] mb-4 bg-gray-100">
+                    <img src="https://i.ytimg.com/vi/pWbGg5kAuhs/hqdefault.jpg"
+                        loading="lazy" class="img-zoom w-full h-full object-cover" alt="Showreel">
+                    <div
+                        class="showcase-overlay absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 transition duration-300">
+                        <i class="fas fa-play-circle text-4xl text-white"></i>
+                    </div>
+                </div>
+                <span
+                    class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Watch on YouTube</span>
+                <h3 class="font-sans text-xl font-bold title-hover leading-tight">Urban Chaos vs. Nature's Peace</h3>
+            </a>
+
+            <!-- 4K Clips -->
+            <a href="https://www.youtube.com/watch?v=t8Fiq33Ek0o" target="_blank" rel="noopener" data-video-id="t8Fiq33Ek0o" class="showcase-card group block min-w-[280px] md:min-w-0 snap-start">
+                <div class="showcase-media img-zoom-container aspect-[16/9] mb-4 bg-gray-100">
+                    <img src="https://i.ytimg.com/vi/t8Fiq33Ek0o/hqdefault.jpg"
+                        loading="lazy" class="img-zoom w-full h-full object-cover" alt="Clips">
+                    <div
+                        class="showcase-overlay absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 transition duration-300">
+                        <i class="fas fa-play-circle text-4xl text-white"></i>
+                    </div>
+                </div>
+                <span class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Watch on YouTube</span>
+                <h3 class="font-sans text-xl font-bold title-hover leading-tight">The Glowing Forests of Bihar</h3>
+            </a>
+
+            <!-- Upcoming -->
+            <a href="https://www.youtube.com/watch?v=Y37mz7r3LNI" target="_blank" rel="noopener" data-video-id="Y37mz7r3LNI" class="showcase-card group block min-w-[280px] md:min-w-0 snap-start">
+                <div class="showcase-media img-zoom-container aspect-[16/9] mb-4 bg-gray-100">
+                    <img src="https://i.ytimg.com/vi/Y37mz7r3LNI/hqdefault.jpg"
+                        loading="lazy" class="img-zoom w-full h-full object-cover" alt="Upcoming">
+                </div>
+                <span class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Watch on YouTube</span>
+                <h3 class="font-sans text-xl font-bold title-hover leading-tight">Shadows of Dhauladhar</h3>
+            </a>
+        </div>
+    </section>
+
+    <!-- 5. NATURE & HABITATS -->
+    <section id="nature" class="py-16 md:py-24 bg-bbc-lightGray border-y border-bbc-border">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+            <div class="mb-12">
+                <span class="text-bbc-tag text-[11px] font-bold uppercase tracking-widest mb-2 block">Nature</span>
+                <h2 class="font-serif text-4xl font-bold mb-4">Habitats of the East</h2>
+                <p class="text-gray-500 max-w-2xl font-light text-lg">From the seasonal floodplains of the Ganges to the
+                    ancient Kaimur hills, explore the three distinct worlds we document.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="group cursor-pointer">
+                    <div class="img-zoom-container aspect-[3/4] mb-6 bg-gray-100">
+                        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=800&auto=format&fit=crop"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Terai Jungle">
+                    </div>
+                    <h3 class="font-serif text-2xl font-bold mb-3 title-hover">The Terai Jungle</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-4">The dense sal forests and swamps of Valmiki
+                        are a critical tiger corridor connecting India and Nepal.</p>
+                </div>
+                <div class="group cursor-pointer">
+                    <div class="img-zoom-container aspect-[3/4] mb-6 bg-gray-100">
+                        <img src="https://images.unsplash.com/photo-1500382017468-9049fee74a62?q=80&w=800&auto=format&fit=crop"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Blue Arteries">
+                    </div>
+                    <h3 class="font-serif text-2xl font-bold mb-3 title-hover">The Blue Arteries</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-4">Bihar's river systems are living entities,
+                        creating and destroying habitats with every flood cycle.</p>
+                </div>
+                <div class="group cursor-pointer">
+                    <div class="img-zoom-container aspect-[3/4] mb-6 bg-gray-100">
+                        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800&auto=format&fit=crop"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Kaimur Plateau">
+                    </div>
+                    <h3 class="font-serif text-2xl font-bold mb-3 title-hover">The Kaimur Plateau</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-4">The rugged, rocky southern frontier with its
+                        unique deciduous scrub and leopard-guarded escarpments.</p>
                 </div>
             </div>
-            <div class="col-card">
-                <div class="col-card__overlay">
-                    <p class="col-card__tag">Aerial</p>
-                    <h3 class="col-card__title">Canopy & Forest Floor</h3>
-                    <p class="col-card__count">218 assets · From $8</p>
+
+            <!-- Natural Phenomena -->
+            <div
+                class="mt-20 flex flex-col md:flex-row gap-12 items-center bg-white p-8 md:p-12 border border-bbc-border">
+                <div class="w-full md:w-1/2 overflow-hidden">
+                    <div class="img-zoom-container aspect-video">
+                        <img src="asset/foggyforest.JPG"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Monsoon Transformation">
+                    </div>
                 </div>
-            </div>
-            <div class="col-card">
-                <div class="col-card__overlay">
-                    <p class="col-card__tag">Marine</p>
-                    <h3 class="col-card__title">Deep Blue</h3>
-                    <p class="col-card__count">190 assets · From $15</p>
-                </div>
-            </div>
-            <div class="col-card">
-                <div class="col-card__overlay">
-                    <p class="col-card__tag">Landscape</p>
-                    <h3 class="col-card__title">Golden Hour Savannas</h3>
-                    <p class="col-card__count">275 assets · From $10</p>
-                </div>
-            </div>
-            <div class="col-card">
-                <div class="col-card__overlay">
-                    <p class="col-card__tag">4K Video</p>
-                    <h3 class="col-card__title">Migration Season</h3>
-                    <p class="col-card__count">88 clips · From $29</p>
+                <div class="w-full md:w-1/2">
+                    <span class="text-bbc-tag text-[11px] font-bold uppercase tracking-widest mb-4 block">Seasonal
+                        Pulse</span>
+                    <h3 class="font-serif text-3xl font-bold mb-6">The Monsoon Transformation</h3>
+                    <p class="text-gray-600 font-light text-lg mb-8">Watch how Bihar's landscape turns from dusty gold
+                        to vibrant emerald in just 48 hours. Our time-lapse archive documents the massive arrival of
+                        life.</p>
+                    <a href="#archive"
+                        class="text-[13px] font-bold uppercase tracking-wider border-b border-black pb-0.5 hover:text-gray-600 transition">View
+                        Time-Lapse Archive</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- =====================================================================
-     HOW IT WORKS
-====================================================================== -->
-    <section class="process" id="how-it-works">
-        <div class="process__inner">
-            <div class="reveal">
-                <p class="section-label">How licensing works</p>
-                <h2 class="section-title">Three steps.<br><em>One download.</em></h2>
+    <!-- 6. ANIMALS (Visual Grid) -->
+    <section id="animals" class="py-16 md:py-24 bg-white border-b border-bbc-border">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-baseline mb-12">
+                <div class="max-w-2xl">
+                    <h2 class="font-serif text-3xl md:text-4xl font-bold mb-4">Wildlife of Eastern India</h2>
+                    <p class="text-gray-600 font-light text-lg">A deep dive into the extraordinary biodiversity of
+                        Bihar. From the deep waters of the Ganges to the dense canopies of Valmiki.</p>
+                </div>
+                <a href="#species-index"
+                    class="mt-6 md:mt-0 text-[13px] font-bold uppercase tracking-wider border-b border-black pb-0.5 hover:text-gray-600 transition whitespace-nowrap">View
+                    Species Index</a>
             </div>
 
-            <div class="process__steps">
-                <div class="process__step reveal reveal-delay-1">
-                    <div class="process__step-num">I</div>
-                    <h3 class="process__step-title">Find your asset</h3>
-                    <p class="process__step-body">
-                        Search by species, habitat, or keyword. Filter by file type, resolution, or license. Every asset
-                        shows a watermarked preview before you commit.
-                    </p>
-                </div>
-                <div class="process__step reveal reveal-delay-2">
-                    <div class="process__step-num">II</div>
-                    <h3 class="process__step-title">Choose a license</h3>
-                    <p class="process__step-body">
-                        Standard for web and print. Extended for merchandise and broadcast. Editorial for news and
-                        documentary. No subscriptions, no surprises.
-                    </p>
-                </div>
-                <div class="process__step reveal reveal-delay-3">
-                    <div class="process__step-num">III</div>
-                    <h3 class="process__step-title">Download instantly</h3>
-                    <p class="process__step-body">
-                        Full-resolution file delivered immediately. Original RAW files available on select assets. Your
-                        license is on file forever.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =====================================================================
-     FEATURED ASSET
-====================================================================== -->
-    <section class="featured">
-        <div class="reveal">
-            <p class="section-label">Asset spotlight</p>
-            <h2 class="section-title" style="margin-bottom:32px">This week's<br><em>editor's pick.</em></h2>
-        </div>
-
-        <div class="featured__inner reveal reveal-delay-1">
-            <div class="featured__image"></div>
-            <div class="featured__info">
-                <div>
-                    <p class="featured__category">Wildlife · Mammals · Africa</p>
-                    <h3 class="featured__title">
-                        Lioness at<br>
-                        <em>First Light</em>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="#species-index" class="group block border-b border-bbc-border pb-6">
+                    <div class="img-zoom-container aspect-[4/3] mb-4 bg-gray-100 overflow-hidden">
+                        <img src="asset/dolphin.JPG"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Dolphin">
+                    </div>
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Mammals</span>
+                    <h3 class="font-serif text-2xl font-bold title-hover leading-tight mb-2">The Gangetic River Dolphin
                     </h3>
-                    <div class="featured__meta">
-                        <div class="featured__meta-row">
-                            <span>Resolution</span>
-                            <span>7360 × 4912 px</span>
-                        </div>
-                        <div class="featured__meta-row">
-                            <span>Format</span>
-                            <span>JPEG + RAW</span>
-                        </div>
-                        <div class="featured__meta-row">
-                            <span>Photographer</span>
-                            <span>A. Mukherjee</span>
-                        </div>
-                        <div class="featured__meta-row">
-                            <span>License</span>
-                            <span>Standard / Extended</span>
-                        </div>
-                    </div>
-                </div>
+                    <p class="text-sm text-gray-600 font-light line-clamp-3">India's National Aquatic Animal thrives in
+                        the Vikramshila sanctuary. We document their complex sonar communication and river habitats.</p>
+                </a>
 
+                <a href="#species-index" class="group block border-b border-bbc-border pb-6">
+                    <div class="img-zoom-container aspect-[4/3] mb-4 bg-gray-100 overflow-hidden">
+                        <img src="asset/Black Kite.jpg"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Stork">
+                    </div>
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Birds</span>
+                    <h3 class="font-serif text-2xl font-bold title-hover leading-tight mb-2">The Sparrowhawk (Shikra)
+                    </h3>
+                    <p class="text-sm text-gray-600 font-light line-clamp-3">The Eurasian Sparrowhawk (Accipiter nisus), a small raptor, was recorded for the first time in Bihar's Rajgir hills in December 2025, marking the location as a new stopover on an international migratory flyway.</p>
+                </a>
+
+                <a href="#species-index" class="group block border-b border-bbc-border pb-6">
+                    <div class="img-zoom-container aspect-[4/3] mb-4 bg-gray-100 overflow-hidden">
+                        <img src="asset/croco2.JPG"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Gharial">
+                    </div>
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Amphibians &
+                        Reptiles</span>
+                    <h3 class="font-serif text-2xl font-bold title-hover leading-tight mb-2">Gharials of the Gandak
+                        River</h3>
+                    <p class="text-sm text-gray-600 font-light line-clamp-3">With distinctive snouts, these critically
+                        endangered crocodilians rely on the clean waters of the Gandak.</p>
+                </a>
+<!-- 
+                <a href="#species-index" class="group block lg:border-b-0 pb-6 lg:pb-0">
+                    <div class="img-zoom-container aspect-[4/3] mb-4 bg-gray-100 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1524704796725-9fc3044a58b2?q=80&w=800&auto=format&fit=crop"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Fish">
+                    </div>
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Fish</span>
+                    <h3 class="font-serif text-2xl font-bold title-hover leading-tight mb-2">The Elusive Golden Mahseer
+                    </h3>
+                    <p class="text-sm text-gray-600 font-light line-clamp-3">Known as the tiger of the water, these
+                        powerful freshwater fish navigate the rocky riverbeds of Northern Bihar.</p>
+                </a> -->
+
+                <a href="#species-index" class="group block sm:border-b-0 pb-6 sm:pb-0">
+                    <div class="img-zoom-container aspect-[4/3] mb-4 bg-gray-100 overflow-hidden">
+                        <img src="asset/spider.JPG"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Insects">
+                    </div>
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Insects &
+                        Arachnids</span>
+                    <h3 class="font-serif text-2xl font-bold title-hover leading-tight mb-2">Masters of the Canopy</h3>
+                    <p class="text-sm text-gray-600 font-light line-clamp-3">From Giant Wood Spiders to brilliant Atlas
+                        Moths, discover the microscopic architects of the Kaimur Highlands.</p>
+                </a>
+
+                <a href="#species-index" class="group block pb-0">
+                    <div class="img-zoom-container aspect-[4/3] mb-4 bg-gray-100 overflow-hidden">
+                        <img src="asset/snail.jpg"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Molluscs">
+                    </div>
+                    <span
+                        class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Molluscs</span>
+                    <h3 class="font-serif text-2xl font-bold title-hover leading-tight mb-2">Architects of the Wetlands
+                    </h3>
+                    <p class="text-sm text-gray-600 font-light line-clamp-3">Freshwater snails act as biological filters
+                        and a foundational food source for the massive bird migrations at Kanwar Lake.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. SPECIES INDEX (Scientific Catalog) -->
+    <section id="species-index" class="py-16 md:py-24 bg-bbc-lightGray border-b border-bbc-border">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+            <div class="mb-12 border-b border-bbc-border pb-8">
+                <span class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag mb-2 block">Database</span>
+                <h2 class="font-serif text-3xl md:text-4xl font-bold mb-4">Regional Species Index</h2>
+                <p class="text-gray-600 font-light max-w-3xl">A comprehensive, scientific checklist of the fauna of
+                    Bihar, aggregated from the Zoological Survey of India (ZSI), Valmiki Tiger Reserve (VTR) census
+                    data, and Gangetic riverine biological surveys.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12">
+                <!-- I. MAMMALS -->
+                <div class="lg:col-span-3 border-b-2 border-black pb-2 mt-4">
+                    <h3 class="font-serif text-2xl font-bold uppercase tracking-wider text-bbc-darkGray">I. Mammals
+                        (Class: Mammalia)</h3>
+                </div>
                 <div>
-                    <div class="featured__price"><sup>$</sup>29</div>
-                    <div class="featured__cta" style="margin-top:20px">
-                        <a href="gallery.html" class="btn-violet">License this asset</a>
-                        <a href="gallery.html" class="btn-outline-sm">Preview watermarked</a>
+                    <h4 class="font-sans text-[13px] font-bold uppercase tracking-widest mb-6 text-bbc-tag">Big Cats &
+                        Carnivores</h4>
+                    <ul class="space-y-4">
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Royal Bengal
+                                Tiger</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Panthera tigris tigris</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Indian Leopard
+                            </h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Panthera pardus fusca</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Jungle Cat
+                            </h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Felis chaus</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Fishing Cat
+                            </h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Prionailurus viverrinus</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Sloth Bear
+                            </h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Melursus ursinus</p>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-sans text-[13px] font-bold uppercase tracking-widest mb-6 text-bbc-tag">Ungulates &
+                        Primates</h4>
+                    <ul class="space-y-4">
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Gaur (Indian
+                                Bison)</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Bos gaurus</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Nilgai (Blue
+                                Bull)</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Boselaphus tragocamelus</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Sambar Deer
+                            </h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Rusa unicolor</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Chital
+                                (Spotted Deer)</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Axis axis</p>
+                        </li>
+                        <li class="group mt-6">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Northern
+                                Plains Gray Langur</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Semnopithecus entellus</p>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-sans text-[13px] font-bold uppercase tracking-widest mb-6 text-bbc-tag">Small
+                        Mammals</h4>
+                    <ul class="space-y-4">
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Indian
+                                Porcupine</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Hystrix indica</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Indian Giant
+                                Flying Squirrel</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Petaurista philippensis</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Indian
+                                Pangolin</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Manis crassicaudata</p>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- II. REPTILES -->
+                <div class="lg:col-span-3 border-b-2 border-black pb-2 mt-8">
+                    <h3 class="font-serif text-2xl font-bold uppercase tracking-wider text-bbc-darkGray">II. Reptiles
+                        (Class: Reptilia)</h3>
+                </div>
+                <div>
+                    <h4 class="font-sans text-[13px] font-bold uppercase tracking-widest mb-6 text-bbc-tag">Crocodilians
+                        & Turtles</h4>
+                    <ul class="space-y-4">
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Gharial</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Gavialis gangeticus</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Mugger
+                                Crocodile</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Crocodylus palustris</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Indian
+                                Softshell Turtle</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Nilssonia gangetica</p>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-sans text-[13px] font-bold uppercase tracking-widest mb-6 text-bbc-tag">Snakes &
+                        Lizards</h4>
+                    <ul class="space-y-4">
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">King Cobra
+                            </h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Ophiophagus hannah</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Russell's
+                                Viper</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Daboia russelii</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Bengal Monitor
+                            </h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Varanus bengalensis</p>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- III. UNDERWATER -->
+                <div class="lg:col-span-3 border-b-2 border-black pb-2 mt-8">
+                    <h3 class="font-serif text-2xl font-bold uppercase tracking-wider text-bbc-darkGray">III. Aquatic
+                        Fauna</h3>
+                </div>
+                <div>
+                    <h4 class="font-sans text-[13px] font-bold uppercase tracking-widest mb-6 text-bbc-tag">Mammals &
+                        Carps</h4>
+                    <ul class="space-y-4">
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Ganges River
+                                Dolphin</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Platanista gangetica</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Golden Mahseer
+                            </h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Tor putitora</p>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-sans text-[13px] font-bold uppercase tracking-widest mb-6 text-bbc-tag">Catfishes &
+                        Invertebrates</h4>
+                    <ul class="space-y-4">
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Goonch (Giant
+                                Devil Catfish)</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Bagarius bagarius</p>
+                        </li>
+                        <li class="group">
+                            <h5 class="font-bold text-gray-900 text-sm group-hover:text-black transition">Giant River
+                                Prawn</h5>
+                            <p class="text-[11px] text-gray-500 font-serif italic">Macrobrachium rosenbergii</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center">
+                <a href="#" onclick="showNotification(event, 'Request Sent')"
+                    class="inline-block border border-bbc-tag text-bbc-tag font-bold uppercase tracking-widest text-[11px] px-8 py-4 hover:bg-black hover:text-white transition">Request
+                    Full ZSI Research Data</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. EXPEDITIONS -->
+    <section id="expeditions" class="py-16 md:py-24 bg-white border-b border-bbc-border">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+            <div class="flex justify-between items-baseline mb-8">
+                <h2 class="font-serif text-3xl font-bold">Immersive Expeditions</h2>
+                <a href="#contact"
+                    class="text-[13px] font-bold uppercase tracking-wider border-b border-black pb-0.5 hover:text-gray-600 transition">Book
+                    Now</a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Fireflies -->
+                <a href="#contact"
+                    class="group block bg-white p-4 shadow-sm border border-bbc-border hover:shadow-lg transition">
+                    <div class="img-zoom-container aspect-square mb-4 bg-gray-200 relative">
+                        <img src="asset/fireflies3.jpg"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Fireflies">
+                        <div
+                            class="absolute top-2 left-2 bg-bbc-accent text-black text-[9px] font-bold uppercase tracking-widest px-2 py-1">
+                            Flagship</div>
+                    </div>
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Bhimbandh
+                        Forest</span>
+                    <h3 class="font-sans text-xl font-bold title-hover mb-2">The Firefly Night Trails</h3>
+                    <p class="text-sm text-gray-600 mb-4 line-clamp-2">Witness millions of fireflies synchronizing their
+                        light.</p>
+                    <p class="font-bold text-sm text-bbc-accent bg-black inline-block px-2 py-1 mb-2 text-xs">BOOKING
+                        FOR JUNE 2026</p>
+                </a>
+
+                <!-- Dolphin -->
+                <a href="#contact"
+                    class="group block bg-white p-4 shadow-sm border border-bbc-border hover:shadow-lg transition">
+                    <div class="img-zoom-container aspect-square mb-4 bg-gray-200">
+                        <img src="asset/dolphin.JPG"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Dolphin">
+                    </div>
+                    <span
+                        class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Vikramshila</span>
+                    <h3 class="font-sans text-xl font-bold title-hover mb-2">The Dolphin Odyssey</h3>
+                    <p class="text-sm text-gray-600 mb-4 line-clamp-2">Navigate the Ganges with aquatic researchers.</p>
+                    <p class="font-bold text-sm">From ₹12,000</p>
+                </a>
+
+                <!-- Tiger -->
+                <a href="#contact"
+                    class="group block bg-white p-4 shadow-sm border border-bbc-border hover:shadow-lg transition">
+                    <div class="img-zoom-container aspect-square mb-4 bg-gray-200">
+                        <img src="https://images.unsplash.com/photo-1588392204645-3121021480b0?q=80&w=600&auto=format&fit=crop"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Tiger">
+                    </div>
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Valmiki
+                        Reserve</span>
+                    <h3 class="font-sans text-xl font-bold title-hover mb-2">Valmiki Tiger Scouting</h3>
+                    <p class="text-sm text-gray-600 mb-4 line-clamp-2">A masterclass in tracking in Bihar's only Tiger
+                        Reserve.</p>
+                    <p class="font-bold text-sm">From ₹18,500</p>
+                </a>
+
+                <!-- Ganges -->
+                <a href="#contact"
+                    class="group block bg-white p-4 shadow-sm border border-bbc-border hover:shadow-lg transition">
+                    <div class="img-zoom-container aspect-square mb-4 bg-gray-200">
+                        <img src="https://images.unsplash.com/photo-1621235338048-2681096b7972?q=80&w=600&auto=format&fit=crop"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Ganges">
+                    </div>
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">River
+                        Ganges</span>
+                    <h3 class="font-sans text-xl font-bold title-hover mb-2">Ganga Heritage Tour</h3>
+                    <p class="text-sm text-gray-600 mb-4 line-clamp-2">Documenting traditional river communities.</p>
+                    <p class="font-bold text-sm">From ₹10,500</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. THE MASTER PLAN (LENS TO LAND CYCLE) -->
+    <section id="masterplan" class="py-24 bg-bbc-black text-white relative overflow-hidden">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 relative z-10">
+            <div class="text-center mb-16">
+                <span class="text-[11px] font-bold uppercase tracking-[0.3em] text-bbc-accent mb-4 block">The
+                    Mechanism</span>
+                <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">FROM LENS TO LAND</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto font-light text-lg">We use the lens to acquire the land. Your
+                    viewership directly funds the re-acquisition of the very Earth we film.</p>
+            </div>
+
+            <!-- 3 Step Cycle -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-24">
+                <div class="text-center group">
+                    <div
+                        class="w-20 h-20 mx-auto rounded-full border border-gray-700 flex items-center justify-center mb-6">
+                        <i class="fas fa-video text-2xl text-white"></i>
+                    </div>
+                    <h3 class="font-sans text-[13px] font-bold uppercase tracking-widest mb-3">1. Create & Broadcast
+                    </h3>
+                    <p class="text-gray-400 font-light text-sm px-4">Produce a passion project with NATBIOS. We
+                        broadcast your documentary, generating awareness and revenue.</p>
+                </div>
+                <div class="text-center group">
+                    <div
+                        class="w-20 h-20 mx-auto rounded-full border border-gray-700 flex items-center justify-center mb-6">
+                        <i class="fas fa-seedling text-2xl text-bbc-accent"></i>
+                    </div>
+                    <h3 class="font-sans text-[13px] font-bold uppercase tracking-widest mb-3">2. Acquire & Restore</h3>
+                    <p class="text-gray-400 font-light text-sm px-4">Profits fund the NATBIOS Earth Fund. We purchase
+                        degraded land and use rapid-growth ecology to rewild it.</p>
+                </div>
+                <div class="text-center group">
+                    <div
+                        class="w-20 h-20 mx-auto rounded-full border border-gray-700 flex items-center justify-center mb-6">
+                        <i class="fas fa-home text-2xl text-white"></i>
+                    </div>
+                    <h3 class="font-sans text-[13px] font-bold uppercase tracking-widest mb-3">3. Live in the Balance
+                    </h3>
+                    <p class="text-gray-400 font-light text-sm px-4">On the edges of restored forests, we build
+                        zero-emission Eco-Villages to fund the next cycle.</p>
+                </div>
+            </div>
+
+            <!-- Split CTA -->
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Filmmakers Form -->
+                <div class="w-full lg:w-1/2 border border-gray-800 p-8 md:p-12 bg-[#111]">
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-bbc-accent mb-4 block">For
+                        Filmmakers</span>
+                    <h3 class="font-serif text-3xl font-bold mb-4">Pledge a Project</h3>
+                    <p class="text-gray-400 font-light mb-8 text-sm">Pitch your environmental documentary to NATBIOS. If
+                        greenlit, your budget goes toward restoring the land.</p>
+
+                    <form onsubmit="return handleFormSubmit(event, 'Project Pledge')" class="space-y-4">
+                        <input type="text" placeholder="Full Name" required
+                            class="w-full bg-transparent border-b border-gray-700 py-3 text-sm focus:outline-none focus:border-bbc-accent">
+                        <input type="email" placeholder="Email Address" required
+                            class="w-full bg-transparent border-b border-gray-700 py-3 text-sm focus:outline-none focus:border-bbc-accent">
+                        <input type="text" placeholder="Project Title" required
+                            class="w-full bg-transparent border-b border-gray-700 py-3 text-sm focus:outline-none focus:border-bbc-accent">
+                        <!-- CLAUDE ACTION POINT: Connect your backend save logic here -->
+                        <button type="submit"
+                            class="w-full bg-white text-black font-bold uppercase tracking-widest text-[11px] py-4 hover:bg-bbc-accent transition mt-4">Submit
+                            Pledge</button>
+                    </form>
+                </div>
+
+                <!-- Residents Form -->
+                <div class="w-full lg:w-1/2 border border-gray-800 p-8 md:p-12 relative overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=800&auto=format&fit=crop"
+                        class="absolute inset-0 w-full h-full object-cover opacity-20" alt="Eco Village">
+                    <div class="relative z-10">
+                        <span class="text-[11px] font-bold uppercase tracking-widest text-gray-300 mb-4 block">For
+                            Residents</span>
+                        <h3 class="font-serif text-3xl font-bold mb-4">Eco-Village Waitlist</h3>
+                        <p class="text-gray-300 font-light mb-8 text-sm">Join the waitlist to secure a lease in our
+                            zero-pollution, restored native forests.</p>
+
+                        <form onsubmit="return handleFormSubmit(event, 'Waitlist')" class="space-y-4">
+                            <input type="text" placeholder="Full Name" required
+                                class="w-full bg-transparent border-b border-gray-400 py-3 text-sm text-white focus:outline-none focus:border-white">
+                            <input type="email" placeholder="Email Address" required
+                                class="w-full bg-transparent border-b border-gray-400 py-3 text-sm text-white focus:outline-none focus:border-white">
+                            <select required
+                                class="w-full bg-transparent border-b border-gray-400 py-3 text-sm text-gray-300 focus:outline-none focus:border-white appearance-none">
+                                <option value="" disabled selected>Why NATBIOS Eco-Village?</option>
+                                <option value="Remote Work" class="text-black">Remote Work</option>
+                                <option value="Conservation" class="text-black">Conservation</option>
+                                <option value="Health" class="text-black">Health & Wellness</option>
+                            </select>
+                            <!-- CLAUDE ACTION POINT: Connect your waitlist DB logic here -->
+                            <button type="submit"
+                                class="w-full bg-bbc-accent text-black font-bold uppercase tracking-widest text-[11px] py-4 hover:bg-white transition mt-4">Join
+                                Waitlist</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- =====================================================================
-     TRUST / SOCIAL PROOF
-====================================================================== -->
-    <section class="trust">
-        <div class="trust__inner">
-            <div class="reveal">
-                <blockquote class="trust__quote">
-                    The quality of wildlife imagery on Natbios is unlike anything I've found on the major platforms.
-                    Genuine field photographers, not stock agency farms.
-                </blockquote>
-                <p class="trust__author"><strong>Priya Nair</strong> — Creative Director, Wildframe Studio</p>
+    <!-- 10. RESTORATION HUB (Sustainability) -->
+    <section id="restoration" class="py-16 md:py-24 max-w-[1400px] mx-auto px-4 lg:px-8 border-b border-bbc-border">
+        <div
+            class="bg-bbc-lightGray border border-bbc-border p-10 md:p-16 flex flex-col md:flex-row items-center gap-12">
+            <div class="w-full md:w-1/2">
+                <span
+                    class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag mb-4 block">Sustainability</span>
+                <h2 class="font-serif text-4xl font-bold mb-6">Restoration in Action</h2>
+                <p class="text-gray-600 text-lg font-light mb-8">Through our "Million Small Ecosystems" project, we fund
+                    the stabilization of riverbanks and protection of forest patches directly from production revenue.
+                </p>
+
+                <div class="mb-6">
+                    <div
+                        class="flex justify-between text-[11px] font-bold uppercase tracking-widest mb-2 text-gray-500">
+                        <span>Restored Habitats</span>
+                        <span class="text-black">42% of 2026 Goal</span>
+                    </div>
+                    <div class="w-full bg-gray-300 h-1">
+                        <div class="bg-bbc-accent h-full" style="width: 42%"></div>
+                    </div>
+                </div>
+                <a href="#masterplan"
+                    class="text-[13px] font-bold uppercase tracking-wider border-b border-black pb-0.5 hover:text-gray-600 transition">Support
+                    via Film Pledges</a>
+            </div>
+            <div class="w-full md:w-1/2 aspect-video img-zoom-container bg-gray-200">
+                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800&auto=format&fit=crop"
+                    loading="lazy" class="img-zoom w-full h-full object-cover" alt="Restoration">
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. FIELD NOTES & SCIENCE (Editorial Grid) -->
+    <section id="articles" class="py-16 md:py-24 max-w-[1400px] mx-auto px-4 lg:px-8 border-b border-bbc-border">
+        <div class="flex justify-between items-baseline mb-8 border-b border-bbc-border pb-4">
+            <h2 class="font-serif text-3xl font-bold">Field Notes & Science</h2>
+            <a href="#articles"
+                class="text-[13px] font-bold uppercase tracking-wider border-b border-black pb-0.5 hover:text-gray-600 transition">View
+                All Articles</a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Featured Field Note -->
+            <a href="#articles" class="group block">
+                <div class="img-zoom-container aspect-video mb-6 bg-gray-200">
+                    <img src="asset/croco2.JPG"
+                        loading="lazy" class="img-zoom w-full h-full object-cover" alt="A gharial resting on the riverbank in Bihar">
+                </div>
+                <span
+                    class="text-[11px] font-bold uppercase tracking-widest text-bbc-accent bg-black inline-block px-2 py-1 mb-3">River
+                    Wildlife / Bihar</span>
+                <h3 class="font-serif text-3xl md:text-4xl font-bold leading-tight mb-4 title-hover">A Quiet Sentinel of Bihar's Rivers</h3>
+                <p class="text-gray-600 text-lg font-light">Resting at the water's edge, the gharial carries the stillness of a healthy river. This remarkable reptile is a reminder that clean currents, undisturbed sandbanks, and patient protection are inseparable.</p>
+            </a>
+
+            <!-- Supporting Field Notes -->
+            <div class="flex flex-col gap-6">
+
+                <a href="#articles"
+                    class="group flex flex-col sm:flex-row gap-6 items-center sm:items-start border-b border-bbc-border pb-6">
+                    <div class="img-zoom-container w-full sm:w-[240px] aspect-video bg-gray-200 shrink-0">
+                        <img src="asset/couplebird_heart.JPG"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Two flamingos together at Valmiki Wildlife, Bihar">
+                    </div>
+                    <div>
+                        <span
+                            class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Wildlife / Valmiki, Bihar</span>
+                        <h4 class="font-sans text-xl font-bold leading-tight title-hover mb-2">A Moment of Grace at Valmiki</h4>
+                        <p class="text-sm text-gray-600 line-clamp-2">Two flamingos pause in a tender, mirrored gesture—an intimate field moment that reveals the quiet poetry behind wildlife observation.</p>
+                    </div>
+                </a>
+                <a href="#articles"
+                    class="group flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+                    <div class="img-zoom-container w-full sm:w-[240px] aspect-video bg-gray-200 shrink-0">
+                        <img src="asset/spidernet.JPG"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="spider net, Bihar">
+                    </div>
+                    <div>
+                        <span
+                            class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag block mb-2">Forest Life / Bihar</span>
+                        <h4 class="font-sans text-xl font-bold leading-tight title-hover mb-2">The Geometry of a Forest Web</h4>
+                        <p class="text-sm text-gray-600 line-clamp-2">Suspended between leaves, a spider's web turns morning light into evidence of precise engineering—an architecture refined by the forest.</p>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 12. TEAM & CREATOR SPOTLIGHT -->
+    <section id="team" class="py-16 md:py-24 bg-bbc-black text-white">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+            <h2 class="font-serif text-3xl md:text-4xl font-bold mb-12 border-b border-gray-800 pb-4">The Team Behind
+                The Lens</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+                <div class="group">
+                    <div class="aspect-[3/4] bg-gray-800 mb-6 overflow-hidden">
+                        <img src="asset/rahul.png"
+                            loading="lazy"
+                            class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                            alt="Rahul">
+                    </div>
+                    <h3 class="font-serif text-2xl font-bold mb-1">Rahul</h3>
+                    <p class="text-[11px] text-bbc-accent font-bold uppercase tracking-widest">Wildlife Photographer,
+                        Filmmaker & Mentor</p>
+                </div>
+                <div class="group">
+                    <div class="aspect-[3/4] bg-gray-800 mb-6 overflow-hidden">
+                        <img src="asset/mj.png"
+                            loading="lazy"
+                            class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                            alt="Mritunjay">
+                    </div>
+                    <h3 class="font-serif text-2xl font-bold mb-1">Mritunjay (MJ)</h3>
+                    <p class="text-[11px] text-bbc-accent font-bold uppercase tracking-widest">Natural History
+                        Cameraman, Visual Storyteller</p>
+                </div>
+                <div class="group">
+                    <div class="aspect-[3/4] bg-gray-800 mb-6 overflow-hidden">
+                        <img src="asset/suraj.png"
+                            loading="lazy"
+                            class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                            alt="Suraj">
+                    </div>
+                    <h3 class="font-serif text-2xl font-bold mb-1">Suraj</h3>
+                    <p class="text-[11px] text-bbc-accent font-bold uppercase tracking-widest">Adventure Photographer &
+                        Expedition Lead</p>
+                </div>
             </div>
 
-            <div class="trust__numbers reveal reveal-delay-1">
-                <div class="trust__number-item">
-                    <div class="trust__big-num">94%</div>
-                    <div class="trust__num-label">of buyers return<br>for a second license</div>
+            <div class="flex flex-col md:flex-row bg-[#1a1a1a] border border-gray-800 rounded-sm overflow-hidden">
+                <div class="w-full md:w-2/5 aspect-square md:aspect-auto bg-gray-800 relative">
+                    <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=800&auto=format&fit=crop"
+                        loading="lazy" class="w-full h-full object-cover opacity-80" alt="Channel">
+                    <i
+                        class="fab fa-youtube absolute inset-0 m-auto text-6xl text-white/50 flex items-center justify-center"></i>
                 </div>
-                <div class="trust__number-item">
-                    <div class="trust__big-num">48h</div>
-                    <div class="trust__num-label">average time from upload<br>to first sale for top photographers</div>
-                </div>
-                <div class="trust__number-item">
-                    <div class="trust__big-num">20TB</div>
-                    <div class="trust__num-label">of original content<br>stored and delivered securely</div>
+                <div class="w-full md:w-3/5 p-10 md:p-16 flex flex-col justify-center">
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-2">Creator
+                        Spotlight</span>
+                    <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">MJ Wildlife India</h3>
+                    <p class="text-gray-300 mb-8 font-light max-w-lg">Explore Mritunjay's personal wildlife
+                        storytelling, behind-the-scenes field notes, and raw nature moments straight from the wild.</p>
+                    <div class="flex gap-4">
+                        <a href="https://youtube.com/@mjwildlifeindia" target="_blank"
+                            class="bg-white text-black font-bold uppercase tracking-widest text-[11px] px-6 py-3 hover:bg-bbc-accent transition">
+                            <i class="fab fa-youtube mr-2 text-red-600"></i> YouTube
+                        </a>
+                        <a href="https://instagram.com/mjwildlifeindia" target="_blank"
+                            class="border border-white text-white font-bold uppercase tracking-widest text-[11px] px-6 py-3 hover:bg-white hover:text-black transition">
+                            <i class="fab fa-instagram mr-2"></i> Instagram
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- =====================================================================
-     CTA BANNER
-====================================================================== -->
-    <section class="cta-banner">
-        <div class="cta-banner__inner reveal">
-            <h2 class="cta-banner__title">
-                Your next project<br>deserves <em>the real thing.</em>
-            </h2>
-            <p class="cta-banner__sub">
-                No AI-generated stock. No staged shots. Every image and video on Natbios was captured in the field by
-                photographers who were actually there.
-            </p>
-            <div class="cta-banner__actions">
-                <a href="gallery.html" class="btn-primary">Browse the library</a>
-                <a href="dashboard.html" class="btn-ghost">Sell your work</a>
+    <!-- 13. COMMERCIAL / B2B SERVICES -->
+    <section id="b2b" class="py-16 md:py-24 max-w-[1400px] mx-auto px-4 lg:px-8 border-b border-bbc-border">
+        <h2 class="font-serif text-3xl md:text-4xl font-bold mb-12 text-center">Corporate & Digital Services</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center group p-6 hover:bg-bbc-lightGray transition duration-300">
+                <i class="fas fa-video text-3xl mb-4 text-bbc-tag"></i>
+                <h3 class="font-sans text-xl font-bold mb-3 title-hover">CSR Video Production</h3>
+                <p class="text-sm text-gray-600 font-light">End-to-end video documentation for stakeholders,
+                    multi-camera live broadcasting, and impact reporting.</p>
+            </div>
+            <div class="text-center group p-6 hover:bg-bbc-lightGray transition duration-300">
+                <i class="fas fa-laptop-code text-3xl mb-4 text-bbc-tag"></i>
+                <h3 class="font-sans text-xl font-bold mb-3 title-hover">Web & Platform Dev</h3>
+                <p class="text-sm text-gray-600 font-light">Website design for eco-businesses and custom online course
+                    platform development for educational institutions.</p>
+            </div>
+            <div class="text-center group p-6 hover:bg-bbc-lightGray transition duration-300">
+                <i class="fas fa-bullhorn text-3xl mb-4 text-bbc-tag"></i>
+                <h3 class="font-sans text-xl font-bold mb-3 title-hover">Social Media Strategy</h3>
+                <p class="text-sm text-gray-600 font-light">Applying our documentary marketing strategies to manage your
+                    environmental or cultural messaging.</p>
             </div>
         </div>
     </section>
 
-    <!-- =====================================================================
-     ABOUT & CONTACT
-====================================================================== -->
-    <section class="about-contact">
-        <div class="about-contact__grid">
-            <div class="reveal" id="about">
-                <p class="section-label">About Natbios</p>
-                <h2 class="section-title">Made for people<br><em>who protect the wild.</em></h2>
-                <p class="about-contact__body">Natbios connects independent nature photographers with designers,
-                    filmmakers, publishers, and conservation teams seeking imagery with a real sense of place.</p>
+    <!-- 14. THE PODCAST -->
+    <section id="podcast" class="bg-bbc-black text-white py-16 border-b border-gray-800">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div class="aspect-video bg-gray-800 relative overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?q=80&w=800&auto=format&fit=crop"
+                    loading="lazy" class="w-full h-full object-cover opacity-70" alt="Podcast">
+                <i
+                    class="fas fa-microphone-alt absolute inset-0 m-auto text-6xl text-white/40 flex items-center justify-center"></i>
             </div>
-            <div class="reveal reveal-delay-1" id="contact">
-                <p class="section-label">Contact</p>
-                <h2 class="section-title">Let’s make<br><em>something meaningful.</em></h2>
-                <p class="about-contact__body">Questions about licensing, a custom brief, or contributing your work? Our
-                    team is ready to help.</p>
-                <a class="contact-link" href="mailto:natbiosproductions@gmail.com">natbiosproductions@gmail.com</a>
+            <div>
+                <span class="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-2 block">Audio</span>
+                <h2 class="font-serif text-3xl md:text-4xl font-bold mb-4">Natbios Field Recordings</h2>
+                <p class="text-gray-300 font-light text-lg mb-8">Intimate stories, ambient soundscapes, and surprising
+                    truths straight from the heart of the wild.</p>
+                <div class="flex flex-wrap gap-4 items-center">
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-gray-500 mr-2">Subscribe:</span>
+                    <a href="#podcast" aria-label="Spotify"
+                        class="text-2xl hover:text-white text-gray-400 transition"><i class="fab fa-spotify"></i></a>
+                    <a href="#podcast" aria-label="Apple Podcasts"
+                        class="text-2xl hover:text-white text-gray-400 transition"><i class="fab fa-apple"></i></a>
+                    <a href="#podcast" aria-label="Podcast"
+                        class="text-2xl hover:text-white text-gray-400 transition"><i class="fas fa-podcast"></i></a>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- =====================================================================
-     FOOTER
-====================================================================== -->
-    <footer class="footer">
-        <div class="footer__inner">
-            <div class="footer__logo">Nat<em>bios</em> Stock</div>
-            <div class="footer__links">
-                <a href="#about" class="footer__link">About</a>
-                <a href="#contact" class="footer__link">Contact</a>
-                <a href="#" class="footer__link">Licensing</a>
-                <a href="#" class="footer__link">Photographers</a>
-                <a href="#" class="footer__link">Privacy</a>
-                <a href="#" class="footer__link">Terms</a>
+    <!-- 15. THE STOCK ARCHIVE -->
+    <section id="archive" class="w-full relative h-[40vh] md:h-[50vh] flex items-center bg-gray-900">
+        <img src="asset/greenwaterfall.jpg" loading="lazy"
+            class="absolute inset-0 w-full h-full object-cover opacity-40" alt="Archive">
+        <div class="relative z-10 max-w-[1400px] mx-auto px-4 lg:px-8 w-full text-center">
+            <h2 class="font-serif text-4xl md:text-6xl font-bold text-white mb-6">The Stock Archive</h2>
+            <p class="text-lg text-gray-300 font-light max-w-2xl mx-auto mb-10">A premium 4K video vault (10,000+ clips)
+                of Indian wildlife, aerials, and landscapes. Strict Rule: No automated checkouts.</p>
+            <a href="gallery.html"
+                class="inline-flex items-center gap-3 bg-bbc-accent text-black font-bold uppercase tracking-widest text-[13px] px-8 py-4 hover:bg-white hover:scale-[1.02] transition duration-300 shadow-lg shadow-black/30">
+                Browse Stock Gallery <span aria-hidden="true">→</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- 16. THE STORE (e-Commerce) -->
+    <section id="shop" class="py-16 md:py-24 border-y border-bbc-border">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+            <div class="flex justify-between items-baseline mb-8">
+                <h2 class="font-serif text-3xl font-bold">From The Store</h2>
+                <a href="#shop"
+                    class="text-[13px] font-bold uppercase tracking-wider border-b border-black pb-0.5 hover:text-gray-600 transition">View
+                    All</a>
             </div>
-            <p class="footer__copy">© <span id="year"></span> Natbios. All rights reserved.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Product 1 -->
+                <div class="group block border border-bbc-border p-4 hover:shadow-lg transition">
+                    <div class="img-zoom-container aspect-square mb-4 bg-bbc-lightGray">
+                        <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=600&auto=format&fit=crop"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Book">
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-bbc-tag block mb-1">Books</span>
+                    <h3 class="font-sans text-lg font-bold title-hover mb-1">"Wild Bihar" Book</h3>
+                    <p class="font-bold text-sm mb-4">₹2,499</p>
+
+                    <!-- CLAUDE STRIPE ACTION: Attach Stripe link here -->
+                    <button onclick="showNotification(event, 'Stripe Checkout Started')"
+                        class="w-full text-center bg-bbc-lightGray text-black text-[11px] font-bold uppercase tracking-widest py-3 group-hover:bg-black group-hover:text-white transition">Buy
+                        Now</button>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="group block border border-bbc-border p-4 hover:shadow-lg transition">
+                    <div class="img-zoom-container aspect-square mb-4 bg-bbc-lightGray">
+                        <img src="https://images.unsplash.com/photo-1610733566164-9d5f75e24cb1?q=80&w=600&auto=format&fit=crop"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Journal">
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-bbc-tag block mb-1">Ethical
+                        Goods</span>
+                    <h3 class="font-sans text-lg font-bold title-hover mb-1">Nature Journal</h3>
+                    <p class="font-bold text-sm mb-4">₹1,200</p>
+                    <button onclick="showNotification(event, 'Stripe Checkout Started')"
+                        class="w-full text-center bg-bbc-lightGray text-black text-[11px] font-bold uppercase tracking-widest py-3 group-hover:bg-black group-hover:text-white transition">Buy
+                        Now</button>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="group block border border-bbc-border p-4 hover:shadow-lg transition">
+                    <div class="img-zoom-container aspect-square mb-4 bg-bbc-lightGray">
+                        <img src="https://images.unsplash.com/photo-1582559937958-390881ce4e31?q=80&w=600&auto=format&fit=crop"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Print">
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-bbc-tag block mb-1">Fine Art
+                        Prints</span>
+                    <h3 class="font-sans text-lg font-bold title-hover mb-1">Tiger Portrait (A2)</h3>
+                    <p class="font-bold text-sm mb-4">₹4,500</p>
+                    <button onclick="showNotification(event, 'Stripe Checkout Started')"
+                        class="w-full text-center bg-bbc-lightGray text-black text-[11px] font-bold uppercase tracking-widest py-3 group-hover:bg-black group-hover:text-white transition">Buy
+                        Now</button>
+                </div>
+
+                <!-- Product 4 -->
+                <div class="group block border border-bbc-border p-4 hover:shadow-lg transition">
+                    <div class="img-zoom-container aspect-square mb-4 bg-bbc-lightGray">
+                        <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=600&auto=format&fit=crop"
+                            loading="lazy" class="img-zoom w-full h-full object-cover" alt="Shirt">
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-bbc-tag block mb-1">Premium
+                        Merch</span>
+                    <h3 class="font-sans text-lg font-bold title-hover mb-1">Explorer T-Shirt</h3>
+                    <p class="font-bold text-sm mb-4">₹999</p>
+                    <button onclick="showNotification(event, 'Stripe Checkout Started')"
+                        class="w-full text-center bg-bbc-lightGray text-black text-[11px] font-bold uppercase tracking-widest py-3 group-hover:bg-black group-hover:text-white transition">Buy
+                        Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 17. CAREERS -->
+    <section id="careers" class="py-16 md:py-24 max-w-[1400px] mx-auto px-4 lg:px-8 border-b border-bbc-border">
+        <div class="flex flex-col md:flex-row bg-bbc-lightGray border border-bbc-border">
+            <div class="w-full md:w-1/2 p-10 md:p-16 flex flex-col justify-center">
+                <span class="text-[11px] font-bold uppercase tracking-widest text-bbc-tag mb-2">Careers</span>
+                <h2 class="font-serif text-3xl md:text-4xl font-bold mb-4">Work With Natbios</h2>
+                <p class="text-gray-600 mb-8 font-light max-w-md">We are always searching for passionate natural history
+                    filmmakers, expedition guides, and conservation researchers to join our basecamp in Patna, Bihar.
+                </p>
+                <a href="#" onclick="showNotification(event, 'Careers Board Opening')"
+                    class="inline-block bg-black text-white font-bold uppercase tracking-widest text-[13px] px-8 py-4 hover:bg-bbc-accent hover:text-black transition w-max">
+                    View Open Roles
+                </a>
+            </div>
+            <div class="w-full md:w-1/2 aspect-video md:aspect-auto img-zoom-container overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=800&auto=format&fit=crop"
+                    loading="lazy" class="img-zoom w-full h-full object-cover" alt="Careers at Natbios">
+            </div>
+        </div>
+    </section>
+
+    <!-- 18. NEWSLETTER -->
+    <section id="newsletter" class="bg-bbc-lightGray border-b border-bbc-border py-16">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="font-serif text-3xl font-bold mb-2">Natbios Newsletter</h2>
+                <p class="text-gray-600 font-light text-lg">Delivered direct to your inbox.</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600 mb-4">Sign up to receive news, updates, and exclusive field notes from
+                    Natbios Productions.</p>
+                <form class="flex flex-col sm:flex-row gap-4"
+                    onsubmit="return handleFormSubmit(event, 'Newsletter Subscription')">
+                    <input type="email" placeholder="Email Address*" required
+                        class="w-full bg-white border border-gray-300 px-4 py-3 focus:outline-none focus:border-black font-sans">
+                    <button type="submit"
+                        class="bg-black text-white font-bold uppercase tracking-widest text-[13px] px-8 py-3 hover:bg-bbc-accent hover:text-black transition whitespace-nowrap">Sign
+                        Up</button>
+                </form>
+                <p class="text-[10px] text-gray-500 mt-4">Your information will be used in accordance with our privacy
+                    policy.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 19. FOOTER -->
+    <footer id="contact" class="bg-white pt-16 pb-8">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <!-- Brand & Address -->
+                <div>
+                    <h3 class="font-serif text-2xl font-bold mb-6 uppercase">Natbios</h3>
+                    <ul class="space-y-3 text-sm text-gray-600">
+                        <li>Patna, Bihar, India</li>
+                        <li>+91 91229 36508</li>
+                        <li><a href="#" class="hover:text-black hover:underline">natbiosproductions@gmail.com</a></li>
+                    </ul>
+                </div>
+                <!-- Discover -->
+                <div>
+                    <h4 class="font-bold uppercase tracking-widest text-[11px] mb-6 text-gray-400">Discover</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 font-bold">
+                        <li><a href="#films" class="hover:text-black hover:underline">Films & Showreels</a></li>
+                        <li><a href="#species-index" class="hover:text-black hover:underline">Species Database</a></li>
+                        <li><a href="#nature" class="hover:text-black hover:underline">Nature Habitats</a></li>
+                        <li><a href="#expeditions" class="hover:text-black hover:underline">Expeditions & Tours</a></li>
+                    </ul>
+                </div>
+                <!-- Info -->
+                <div>
+                    <h4 class="font-bold uppercase tracking-widest text-[11px] mb-6 text-gray-400">Information</h4>
+                    <ul class="space-y-3 text-sm text-gray-600 font-bold">
+                        <li><a href="#masterplan" class="hover:text-black hover:underline">The Master Plan</a></li>
+                        <li><a href="#team" class="hover:text-black hover:underline">Our Team</a></li>
+                        <li><a href="#b2b" class="hover:text-black hover:underline">Commercial B2B Services</a></li>
+                        <li><a href="#contact" class="hover:text-black hover:underline">Investor Relations</a></li>
+                    </ul>
+                </div>
+                <!-- Socials -->
+                <div>
+                    <h4 class="font-bold uppercase tracking-widest text-[11px] mb-6 text-gray-400">Follow Natbios</h4>
+                    <div class="flex space-x-6">
+                        <a href="#" aria-label="Instagram" class="text-2xl text-gray-400 hover:text-black transition"><i
+                                class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Twitter/X" class="text-2xl text-gray-400 hover:text-black transition"><i
+                                class="fab fa-x-twitter"></i></a>
+                        <a href="#" aria-label="YouTube" class="text-2xl text-gray-400 hover:text-black transition"><i
+                                class="fab fa-youtube"></i></a>
+                        <a href="#" aria-label="LinkedIn" class="text-2xl text-gray-400 hover:text-black transition"><i
+                                class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sign-off & Legal -->
+            <div
+                class="border-t border-bbc-border pt-8 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="font-serif italic text-lg text-gray-800">
+                    "To stop the destruction of the very place that gives us life, we must give more than we take."
+                </p>
+                <div
+                    class="flex flex-col items-center md:items-end text-[10px] text-gray-500 uppercase tracking-widest">
+                    <div class="flex space-x-4 mb-2">
+                        <a href="#contact" class="hover:text-black hover:underline">Terms & Conditions</a>
+                        <a href="#contact" class="hover:text-black hover:underline">Privacy Policy</a>
+                    </div>
+                    <p>&copy; 2026 NATBIOS PRODUCTIONS PVT LTD.</p>
+                </div>
+            </div>
         </div>
     </footer>
 
-    <!-- =====================================================================
-     SCRIPTS
-====================================================================== -->
+    <!-- Custom Pop-up Notification (Replaces annoying alerts) -->
+    <div id="notification" class="bg-black text-white px-6 py-4 shadow-2xl flex items-center gap-4">
+        <i class="fas fa-check-circle text-bbc-accent"></i>
+        <span id="notif-text" class="text-xs font-bold uppercase tracking-widest">Successfully Submitted</span>
+    </div>
+
     <script>
-        // Footer year
-        document.getElementById('year').textContent = new Date().getFullYear();
-
-        // Sticky nav background on scroll
-        const nav = document.getElementById('main-nav');
-        window.addEventListener('scroll', () => {
-            nav.classList.toggle('scrolled', window.scrollY > 60);
-        }, { passive: true });
-
-        // Scroll reveal
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(e => {
-                if (e.isIntersecting) {
-                    e.target.classList.add('visible');
-                    observer.unobserve(e.target);
-                }
-            });
-        }, { threshold: 0.12 });
-
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-        // Swap the hero's real wildlife photographs every three seconds.
-        const heroSlides = Array.from(document.querySelectorAll('.hero__slide'));
-        let activeSlide = 0;
-        if (heroSlides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            window.setInterval(() => {
-                heroSlides[activeSlide].classList.remove('is-active');
-                activeSlide = (activeSlide + 1) % heroSlides.length;
-                heroSlides[activeSlide].classList.add('is-active');
-            }, 3000);
+        // ACTION 1: Simple Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                menu.classList.add('flex');
+            } else {
+                menu.classList.add('hidden');
+                menu.classList.remove('flex');
+            }
         }
 
-        // Mobile hamburger — simple toggle (extend for full menu if needed)
-        document.getElementById('hamburger').addEventListener('click', () => {
-            const links = document.querySelector('.nav__links');
-            const isOpen = links.style.display === 'flex';
-            links.style.display = isOpen ? 'none' : 'flex';
-            links.style.flexDirection = 'column';
-            links.style.position = 'absolute';
-            links.style.top = '72px';
-            links.style.left = '0';
-            links.style.right = '0';
-            links.style.background = 'rgba(9,9,15,.98)';
-            links.style.padding = '24px';
-            links.style.gap = '20px';
-            links.style.borderBottom = '1px solid rgba(255,255,255,.06)';
+        // ACTION 2: Show a beautiful notification when a form is submitted or button is clicked
+        function showNotification(event, messageType) {
+            event.preventDefault(); // Stop page reload for demo
+
+            const popup = document.getElementById('notification');
+            const text = document.getElementById('notif-text');
+
+            text.innerText = messageType;
+            popup.classList.add('show');
+
+            // Hide after 3 seconds
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 3000);
+
+            return false;
+        }
+
+        // ACTION 3: Re-use the notification for the forms (Waitlist, Newsletter, etc.)
+        function handleFormSubmit(event, formName) {
+            showNotification(event, formName + ' Received Successfully!');
+            event.target.reset(); // Clear the typing boxes
+            return false;
+        }
+
+        // ACTION 4: Smooth scroll for any link that starts with '#'
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    e.preventDefault();
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
         });
     </script>
+<script>
+    const slides = document.querySelectorAll('.hero-slide');
+    let currentSlide = 0;
 
+    setInterval(() => {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    }, 5000);
+</script>
+    <script>
+        // Load a muted YouTube preview only while a mouse is over a Showcase card.
+        // This avoids loading all four players when the page first opens.
+        if (window.matchMedia('(hover: hover)').matches) {
+            document.querySelectorAll('.showcase-card').forEach((card) => {
+                const media = card.querySelector('.showcase-media');
+                const videoId = card.dataset.videoId;
+
+                card.addEventListener('pointerenter', () => {
+                    if (media.querySelector('.showcase-player')) return;
+
+                    const preview = document.createElement('div');
+                    preview.className = 'showcase-player';
+                    preview.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&playsinline=1" title="Muted video preview" allow="autoplay; encrypted-media"></iframe>`;
+                    media.appendChild(preview);
+                });
+
+                card.addEventListener('pointerleave', () => {
+                    media.querySelector('.showcase-player')?.remove();
+                });
+            });
+        }
+    </script>
 </body>
 
 </html>

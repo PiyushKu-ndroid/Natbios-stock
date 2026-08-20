@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Natbios Stock — Stock Photography & Video</title>
+    <title>NATBIOS Stock Archive | Photography & Video</title>
     <meta name="description" content="License world-class photography and 4K video from independent creators." />
 
     <!-- =====================================================================
@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
         rel="stylesheet" />
 
     <!-- =====================================================================
@@ -875,6 +875,22 @@
                 transition-duration: 0.01ms !important;
             }
         }
+
+        /* Landing-page visual system */
+        :root { --c-bg:#fff; --c-surface:#fff; --c-surface-2:#f5f5f5; --c-border:#e5e5e5; --c-accent:#a4ea64; --c-accent-dark:#8ed84e; --c-text:#141414; --c-text-muted:#666; --radius-sm:0px; --radius-md:0px; --radius-lg:0px; --shadow-card:none; --shadow-modal:0 24px 64px rgba(0,0,0,.3); --grid-gap:20px; }
+        body { color:var(--c-text); }
+        .nav { height:80px; padding:0 max(24px, calc((100vw - 1400px) / 2 + 32px)); background:rgba(255,255,255,.96); border-bottom-color:var(--c-border); backdrop-filter:blur(12px); }
+        .nav__logo { font-family:var(--font-ui); color:var(--c-text); font-size:1.45rem; font-weight:800; letter-spacing:-.05em; text-transform:uppercase; gap:0; border-left:4px solid #141414; padding-left:8px; }
+        .nav__logo span { color:var(--c-text); } .nav__logo .logo-accent { color:var(--c-accent); }
+        .nav__section-label { margin-left:18px; padding-left:18px; border-left:1px solid var(--c-border); color:var(--c-text-muted); font-size:.7rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+        .nav__links { gap:10px; } .nav__back-link { color:var(--c-text-muted); font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin-right:14px; } .nav__back-link:hover { color:var(--c-text); text-decoration:underline; }
+        .btn { border-radius:0; text-transform:uppercase; font-size:.7rem; letter-spacing:.1em; padding:11px 16px; } .btn-primary { background:var(--c-accent); color:#141414; } .btn-primary:hover { background:#141414; color:#fff; } .btn-ghost { color:var(--c-text); border-color:var(--c-border); } .btn-ghost:hover { border-color:#141414; color:#141414; }
+        .hero { max-width:1400px; margin:0 auto; padding:82px 32px 45px; text-align:left; border-bottom:1px solid var(--c-border); } .hero__eyebrow { color:var(--c-text-muted); font-size:.68rem; font-weight:700; letter-spacing:.22em; margin-bottom:18px; } .hero__title { font-size:clamp(2.7rem,5.5vw,5rem); max-width:760px; color:#141414; margin-bottom:30px; } .hero__title em { color:#141414; font-style:italic; }
+        .search-form { max-width:720px; margin:0; border-radius:0; background:#fff; } #search-input { color:#141414; } #search-btn { background:#141414; color:#fff; text-transform:uppercase; font-weight:700; letter-spacing:.1em; font-size:.7rem; } #search-btn:hover { background:var(--c-accent); color:#141414; }
+        .tag-bar,.grid-container { max-width:1400px; margin-left:auto; margin-right:auto; } .tag-bar { padding:28px 32px 34px; } .tag-pill { border-radius:0; background:#fff; color:var(--c-text-muted); font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; } .tag-pill:hover,.tag-pill.is-active { background:#141414; color:#fff; border-color:#141414; }
+        .grid-container { padding:0 32px 70px; } .grid-status { color:var(--c-text-muted); } .asset-card { border-radius:0; background:#f5f5f5; box-shadow:none; } .asset-card:hover { transform:none; box-shadow:none; } .asset-card__overlay { padding:16px; } .asset-card__price { color:var(--c-accent); } .asset-card__badge { border-radius:0; font-size:.62rem; }
+        .load-more-wrap { padding-bottom:70px; } .footer { color:var(--c-text-muted); background:#141414; border:none; padding:34px 24px; } .modal,.auth-modal { background:#fff; } .modal__info,#modal-title,.modal__spec-value,.auth-modal__title { color:#141414; } .modal__close,.form-group input,.form-group select { background:#fff; color:#141414; } .modal__tag { border-radius:0; background:#f5f5f5; }
+        @media (max-width:700px) { .nav { height:64px; padding:0 16px; } .nav__section-label,.nav__back-link { display:none; } .hero { padding:56px 16px 32px; } .tag-bar { padding:22px 16px 28px; } .grid-container { padding:0 16px 48px; } .nav__links { gap:6px; } .nav__links .btn { padding:9px 10px; font-size:.62rem; } }
     </style>
 </head>
 
@@ -884,12 +900,13 @@
          NAVIGATION
     ===================================================================== -->
     <nav class="nav" role="navigation" aria-label="Main navigation">
-        <a href="#" class="nav__logo">
-            <img src="natbioslogog.png" alt="Natbios" height="32" style="vertical-align:middle;" />
-            <span> Stock</span>
+        <a href="index.html" class="nav__logo" aria-label="Go to NATBIOS home">
+            <span>N<span class="logo-accent">A</span>TBIOS</span>
         </a>
+        <span class="nav__section-label">Stock Archive</span>
 
         <div class="nav__links">
+            <a href="index.html" class="nav__back-link">Back to home</a>
             <!-- Shown when the user is NOT logged in -->
             <div id="nav-auth-signed-out">
                 <button class="btn btn-ghost" id="btn-open-login">Log in</button>
@@ -909,15 +926,15 @@
          HERO + SEARCH
     ===================================================================== -->
     <header class="hero" role="banner">
-        <p class="hero__eyebrow">Over 50,000 licensed works</p>
+        <p class="hero__eyebrow">NATBIOS Productions / Stock Archive</p>
         <h1 class="hero__title">
-            Stock photos &amp; video<br />
-            <em>worth licensing.</em>
+            India, in its<br />
+            <em>wildest detail.</em>
         </h1>
 
         <form class="search-form" id="search-form" role="search">
             <label for="search-input" class="visually-hidden">Search photos and videos</label>
-            <input id="search-input" type="search" placeholder="Search landscapes, portraits, 4K video…"
+            <input id="search-input" type="search" placeholder="Search wildlife, landscapes, aerials, 4K video..."
                 autocomplete="off" spellcheck="false" />
             <button type="submit" id="search-btn" aria-label="Run search">Search</button>
         </form>
