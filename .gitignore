@@ -14,5 +14,4 @@ Thumbs.db
 
 # Node modules
 node_modules/
-# Private original media
-asset/
+
