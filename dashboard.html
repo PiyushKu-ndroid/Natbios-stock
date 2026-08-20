@@ -875,6 +875,35 @@
             }
         }
 
+        /* Landing-page dashboard theme */
+        .app-shell { grid-template-columns: 250px 1fr; grid-template-rows: 80px 1fr; }
+        .topnav { padding: 0 max(24px, calc((100vw - 1400px) / 2 + 32px)); background: rgba(255,255,255,.96); }
+        .topnav__logo { font-family: var(--font-ui); font-size: 1.45rem; font-weight: 800; letter-spacing: -.05em; text-transform: uppercase; color: var(--c-text); border-left: 4px solid var(--c-text); padding-left: 8px; gap: 0; }
+        .topnav__logo span { color: var(--c-text); } .topnav__logo .logo-accent { color: var(--c-accent); }
+        .topnav__right { gap: 10px; }
+        .btn { border-radius: 0; text-transform: uppercase; font-size: .7rem; letter-spacing: .1em; padding: 10px 15px; }
+        .btn-primary { color: #141414; } .btn-primary:not(:disabled):hover { background: #141414; color: #fff; }
+        .btn-ghost { color: var(--c-text); } .btn-ghost:not(:disabled):hover { color: var(--c-text); border-color: var(--c-text); }
+        .sidebar { top: 80px; height: calc(100vh - 80px); padding-top: 28px; }
+        .sidebar__label { font-size: .65rem; font-weight: 700; letter-spacing: .14em; }
+        .sidebar__link { border-radius: 0; font-size: .78rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+        .sidebar__link.is-active { background: #141414; color: #fff; }
+        .sidebar__link.is-active .sidebar__icon { color: var(--c-accent); }
+        .stat-mini, .stat-card, .panel, .queue-item { border-radius: 0; }
+        .stat-mini__value, .stat-card__value { color: #141414; }
+        .main { padding: 48px max(24px, calc((100vw - 1400px) / 2 + 32px)); }
+        .section-title { font-size: clamp(2rem, 3vw, 2.8rem); }
+        .section-subtitle { font-size: .9rem; font-weight: 300; }
+        .stats-row { gap: 20px; }
+        .stat-card { padding: 24px; border-top: 3px solid #141414; }
+        .panel__header { padding: 18px 20px; } .panel__title { font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; }
+        .asset-table th { background: #f5f5f5; } .asset-table tr:hover td { background: #fafafa; }
+        .drop-zone { background: #fafafa; border-radius: 0; } .drop-zone.is-over { background: #f1ffe6; }
+        .form-group input, .form-group select, .form-group textarea, #assets-search-input, .tag-input-wrap { background: #fff; }
+        .tag-chip, .badge { border-radius: 0; }
+        #auth-gate { background: #fff; }
+        .toast { background: #fff; border-radius: 0; }
+
         /* ================================================================
            RESPONSIVE
         ================================================================ */
@@ -960,9 +989,8 @@
 
         <!-- TOP NAV -->
         <header class="topnav">
-            <a href="index.html" class="topnav__logo">
-                <img src="natbioslogog.png" alt="Natbios" height="28" style="vertical-align:middle;" />
-                <span> Stock</span>
+            <a href="index.html" class="topnav__logo" aria-label="Go to NATBIOS home">
+                <span>N<span class="logo-accent">A</span>TBIOS</span>
             </a>
             <div class="topnav__right">
                 <span id="dash-user-email"></span>
