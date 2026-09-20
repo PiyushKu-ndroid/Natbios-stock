@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Field Notes & Science — Natbios</title>
+    <meta name="description" content="Wildlife and nature articles from Natbios photographers and scientists." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --ink:    #09090f;
+            --ink-2:  #111119;
+            --ink-3:  #1a1a27;
+            --border: #ffffff0f;
+            --green:  #a4ea64;
+            --chalk:  #f0eef8;
+            --chalk-2:#a09dba;
+            --chalk-3:#5c5975;
+            --serif:  'Cormorant Garamond', Georgia, serif;
+            --body:   'DM Sans', system-ui, sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--body);
+            background:  var(--ink);
+            color:       var(--chalk);
+            -webkit-font-smoothing: antialiased;
+        }
+        a { color: inherit; text-decoration: none; }
+
+        /* ── NAV ── */
+        .nav {
+            position:        fixed; top: 0; left: 0; right: 0; z-index: 100;
+            display:         flex;
+            align-items:     center;
+            justify-content: space-between;
+            padding:         0 clamp(20px, 5vw, 60px);
+            height:          60px;
+            background:      rgba(9,9,15,.92);
+            backdrop-filter: blur(12px);
+            border-bottom:   1px solid var(--border);
+        }
+        .nav__logo {
+            display:     flex;
+            align-items: center;
+            gap:         8px;
+            font-family: var(--serif);
+            font-size:   1.2rem;
+        }
+        .nav__logo img  { height: 28px; }
+        .nav__logo span { color: var(--green); }
+        .nav__links { display: flex; align-items: center; gap: 24px; }
+        .nav__link {
+            font-size:      0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color:          var(--chalk-2);
+            transition:     color 150ms ease;
+        }
+        .nav__link:hover, .nav__link.active { color: var(--chalk); }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            padding:    120px clamp(20px, 8vw, 120px) 56px;
+            border-bottom: 1px solid var(--border);
+        }
+        .page-header__eyebrow {
+            font-size:      0.68rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color:          var(--green);
+            margin-bottom:  16px;
+            display:        flex;
+            align-items:    center;
+            gap:            12px;
+        }
+        .page-header__eyebrow::before {
+            content: ''; display: block;
+            width: 32px; height: 1px; background: var(--green);
+        }
+        .page-header__title {
+            font-family:  var(--serif);
+            font-size:    clamp(2.5rem, 5vw, 4rem);
+            font-weight:  400;
+            line-height:  1.05;
+            margin-bottom: 16px;
+        }
+        .page-header__title em { font-style: italic; color: var(--green); }
+        .page-header__sub {
+            font-size:  0.9rem;
+            font-weight: 300;
+            color:      var(--chalk-2);
+            max-width:  500px;
+            line-height: 1.6;
+        }
+
+        /* ── CATEGORY FILTER ── */
+        .filter-bar {
+            padding:    24px clamp(20px, 8vw, 120px);
+            display:    flex;
+            gap:        8px;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border);
+            scrollbar-width: none;
+        }
+        .filter-bar::-webkit-scrollbar { display: none; }
+
+        .filter-pill {
+            padding:       7px 16px;
+            border-radius: 999px;
+            font-size:     0.72rem;
+            font-weight:   500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background:    transparent;
+            color:         var(--chalk-3);
+            border:        1px solid var(--border);
+            cursor:        pointer;
+            white-space:   nowrap;
+            transition:    all 150ms ease;
+        }
+        .filter-pill:hover, .filter-pill.active {
+            background:   var(--green);
+            color:        #000;
+            border-color: var(--green);
+        }
+
+        /* ── ARTICLES GRID ── */
+        .grid-wrap {
+            max-width: 1300px;
+            margin:    0 auto;
+            padding:   56px clamp(20px, 5vw, 60px) 80px;
+        }
+
+        /* Featured first article — full width */
+        .featured-article {
+            display:      grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap:          0;
+            margin-bottom: 4px;
+            cursor:       pointer;
+        }
+        .featured-article__image {
+            aspect-ratio: 16/10;
+            object-fit:   cover;
+            background:   var(--ink-3);
+            display:      block;
+            width:        100%;
+            transition:   transform 400ms ease;
+        }
+        .featured-article:hover .featured-article__image { transform: scale(1.02); }
+        .featured-article__image-wrap { overflow: hidden; }
+
+        .featured-article__info {
+            background: var(--ink-2);
+            padding:    40px 44px;
+            display:    flex;
+            flex-direction: column;
+            justify-content: center;
+            border:     1px solid var(--border);
+            border-left: none;
+        }
+        .featured-article__category {
+            font-size:      0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color:          var(--green);
+            margin-bottom:  16px;
+        }
+        .featured-article__title {
+            font-family:   var(--serif);
+            font-size:     clamp(1.6rem, 2.5vw, 2.2rem);
+            font-weight:   400;
+            line-height:   1.2;
+            color:         var(--chalk);
+            margin-bottom: 16px;
+        }
+        .featured-article__excerpt {
+            font-size:     0.85rem;
+            font-weight:   300;
+            line-height:   1.7;
+            color:         var(--chalk-2);
+            margin-bottom: 28px;
+        }
+        .featured-article__meta {
+            font-size:  0.72rem;
+            color:      var(--chalk-3);
+        }
+        .read-more {
+            display:        inline-flex;
+            align-items:    center;
+            gap:            8px;
+            font-size:      0.72rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color:          var(--green);
+            margin-top:     auto;
+            padding-top:    24px;
+            border-top:     1px solid var(--border);
+        }
+
+        /* Regular grid — 3 columns */
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap:     4px;
+            margin-top: 4px;
+        }
+
+        .article-card {
+            background: var(--ink-2);
+            cursor:     pointer;
+            overflow:   hidden;
+            border:     1px solid var(--border);
+            transition: border-color 200ms ease;
+        }
+        .article-card:hover { border-color: rgba(164,234,100,.3); }
+
+        .article-card__image-wrap { overflow: hidden; }
+        .article-card__image {
+            width:        100%;
+            aspect-ratio: 16/9;
+            object-fit:   cover;
+            background:   var(--ink-3);
+            display:      block;
+            transition:   transform 400ms ease;
+        }
+        .article-card:hover .article-card__image { transform: scale(1.04); }
+
+        .article-card__body { padding: 20px 22px 24px; }
+        .article-card__category {
+            font-size:      0.62rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color:          var(--green);
+            margin-bottom:  8px;
+        }
+        .article-card__title {
+            font-family:   var(--serif);
+            font-size:     1.15rem;
+            font-weight:   400;
+            line-height:   1.3;
+            color:         var(--chalk);
+            margin-bottom: 10px;
+        }
+        .article-card__excerpt {
+            font-size:   0.78rem;
+            font-weight: 300;
+            line-height: 1.6;
+            color:       var(--chalk-3);
+            display:     -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow:    hidden;
+        }
+        .article-card__meta {
+            font-size:  0.68rem;
+            color:      var(--chalk-3);
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Load more */
+        .load-more-wrap { text-align: center; margin-top: 48px; }
+        .btn-load-more {
+            padding:        12px 40px;
+            border:         1px solid var(--border);
+            background:     transparent;
+            color:          var(--chalk-2);
+            font-family:    var(--body);
+            font-size:      0.78rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border-radius:  2px;
+            cursor:         pointer;
+            transition:     all 150ms ease;
+        }
+        .btn-load-more:hover { border-color: var(--green); color: var(--green); }
+        .btn-load-more:disabled { opacity: .4; cursor: not-allowed; }
+
+        /* ── EMPTY / LOADING ── */
+        .state {
+            text-align:  center;
+            padding:     80px 24px;
+            color:       var(--chalk-3);
+        }
+        .state span { display: block; font-size: 2.5rem; margin-bottom: 16px; opacity: .3; }
+        .state p    { font-size: 0.85rem; }
+
+        .spinner {
+            width: 28px; height: 28px;
+            border: 2px solid var(--border);
+            border-top-color: var(--green);
+            border-radius: 50%;
+            animation: spin 700ms linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── FOOTER ── */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding:    32px clamp(20px, 5vw, 60px);
+            display:    flex;
+            align-items: center;
+            justify-content: space-between;
+            gap:         16px;
+            flex-wrap:   wrap;
+        }
+        .footer__logo { font-family: var(--serif); font-size: 1rem; color: var(--chalk-3); }
+        .footer__logo span { color: var(--green); }
+        .footer__copy { font-size: 0.72rem; color: var(--chalk-3); }
+
+        /* ── REVEAL ── */
+        .reveal { opacity: 0; transform: translateY(20px); transition: opacity 600ms ease, transform 600ms ease; }
+        .reveal.visible { opacity: 1; transform: none; }
+
+        @media (max-width: 900px) {
+            .featured-article { grid-template-columns: 1fr; }
+            .featured-article__info { border-left: 1px solid var(--border); border-top: none; }
+            .articles-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 580px) {
+            .articles-grid { grid-template-columns: 1fr; }
+            .nav__links { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, .reveal { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; opacity: 1 !important; transform: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <a href="landing.html" class="nav__logo">
+        <img src="logo.png" alt="Natbios" onerror="this.style.display='none'" />
+        <span>Stock</span>
+    </a>
+    <div class="nav__links">
+        <a href="articles.html" class="nav__link active">Field Notes</a>
+        <a href="index.html" class="nav__link">Stock Library</a>
+        <a href="landing.html" class="nav__link">Home</a>
+    </div>
+</nav>
+
+<header class="page-header">
+    <p class="page-header__eyebrow">Dispatches from the field</p>
+    <h1 class="page-header__title">Field Notes<br><em>& Science</em></h1>
+    <p class="page-header__sub">Stories, observations, and science from Natbios photographers working across India's wildest habitats.</p>
+</header>
+
+<!-- Category filters — populated from DB -->
+<div class="filter-bar" id="filter-bar">
+    <button class="filter-pill active" data-category="all">All</button>
+</div>
+
+<main class="grid-wrap">
+    <div id="articles-container">
+        <div class="state">
+            <div class="spinner"></div>
+            <p>Loading articles…</p>
+        </div>
+    </div>
+    <div class="load-more-wrap" id="load-more-wrap" style="display:none">
+        <button class="btn-load-more" id="load-more-btn">Load more articles</button>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="footer__logo">Natbios <span>Stock</span></div>
+    <p class="footer__copy">© <span id="year"></span> Natbios. All rights reserved.</p>
+</footer>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL  = 'https://edbydwpdyzbowcnhlzkb.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkYnlkd3BkeXpib3djbmhsemtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1Mjc0MTQsImV4cCI6MjEwMTEwMzQxNH0.Rb0porIQKtLYjfKL9qETOGqM2vXJPqwQ1Wa0pU00lu4';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const PAGE_SIZE  = 9;
+let   page       = 0;
+let   activeCategory = 'all';
+let   hasMore    = true;
+let   allArticles = [];
+
+// ── LOAD ARTICLES ─────────────────────────────────────────────────────────
+async function loadArticles(reset = false) {
+    if (reset) { page = 0; hasMore = true; allArticles = []; }
+
+    const from = page * PAGE_SIZE;
+    const to   = from + PAGE_SIZE - 1;
+
+    let query = supabase
+        .from('articles')
+        .select('id, title, slug, category, location, excerpt, cover_image, author, created_at')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false })
+        .range(from, to);
+
+    if (activeCategory !== 'all') {
+        query = query.eq('category', activeCategory);
+    }
+
+    const { data: articles, error } = await query;
+
+    if (error) {
+        document.getElementById('articles-container').innerHTML =
+            '<div class="state"><span>🌿</span><p>Could not load articles. Please refresh.</p></div>';
+        return;
+    }
+
+    hasMore = articles.length === PAGE_SIZE;
+    allArticles = reset ? articles : [...allArticles, ...articles];
+
+    renderArticles(allArticles, reset);
+    populateFilters(allArticles);
+
+    document.getElementById('load-more-wrap').style.display = hasMore ? 'block' : 'none';
+    const btn = document.getElementById('load-more-btn');
+    btn.disabled = false;
+    btn.textContent = 'Load more articles';
+
+    page++;
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function renderArticles(articles, reset) {
+    const container = document.getElementById('articles-container');
+
+    if (!articles.length) {
+        container.innerHTML = '<div class="state"><span>🦎</span><p>No articles in this category yet.</p></div>';
+        return;
+    }
+
+    const [featured, ...rest] = articles;
+
+    const featuredHtml = `
+        <div class="featured-article reveal"
+             onclick="window.location='article.html?slug=${esc(featured.slug)}'">
+            <div class="featured-article__image-wrap">
+                <img class="featured-article__image"
+                     src="${esc(featured.cover_image || '')}"
+                     onerror="this.style.opacity='.2'"
+                     alt="${esc(featured.title)}" />
+            </div>
+            <div class="featured-article__info">
+                <p class="featured-article__category">
+                    ${esc(featured.category)}${featured.location ? ' / ' + esc(featured.location) : ''}
+                </p>
+                <h2 class="featured-article__title">${esc(featured.title)}</h2>
+                <p class="featured-article__excerpt">${esc(featured.excerpt || '')}</p>
+                <p class="featured-article__meta">By ${esc(featured.author)} · ${fmtDate(featured.created_at)}</p>
+                <span class="read-more">Read article →</span>
+            </div>
+        </div>
+    `;
+
+    const gridHtml = rest.length ? `
+        <div class="articles-grid">
+            ${rest.map(a => `
+                <div class="article-card reveal"
+                     onclick="window.location='article.html?slug=${esc(a.slug)}'">
+                    <div class="article-card__image-wrap">
+                        <img class="article-card__image"
+                             src="${esc(a.cover_image || '')}"
+                             onerror="this.style.opacity='.15'"
+                             alt="${esc(a.title)}" />
+                    </div>
+                    <div class="article-card__body">
+                        <p class="article-card__category">
+                            ${esc(a.category)}${a.location ? ' / ' + esc(a.location) : ''}
+                        </p>
+                        <h3 class="article-card__title">${esc(a.title)}</h3>
+                        <p class="article-card__excerpt">${esc(a.excerpt || '')}</p>
+                        <p class="article-card__meta">By ${esc(a.author)} · ${fmtDate(a.created_at)}</p>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    ` : '';
+
+    if (reset) {
+        container.innerHTML = featuredHtml + gridHtml;
+    } else {
+        // On load more: just append the new grid cards
+        const existingGrid = container.querySelector('.articles-grid');
+        if (existingGrid && rest.length) {
+            existingGrid.insertAdjacentHTML('beforeend', rest.map(a => `
+                <div class="article-card reveal"
+                     onclick="window.location='article.html?slug=${esc(a.slug)}'">
+                    <div class="article-card__image-wrap">
+                        <img class="article-card__image"
+                             src="${esc(a.cover_image || '')}"
+                             onerror="this.style.opacity='.15'"
+                             alt="${esc(a.title)}" />
+                    </div>
+                    <div class="article-card__body">
+                        <p class="article-card__category">${esc(a.category)}</p>
+                        <h3 class="article-card__title">${esc(a.title)}</h3>
+                        <p class="article-card__excerpt">${esc(a.excerpt || '')}</p>
+                        <p class="article-card__meta">By ${esc(a.author)} · ${fmtDate(a.created_at)}</p>
+                    </div>
+                </div>
+            `).join(''));
+        }
+    }
+
+    // Trigger scroll reveal on new cards
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el => observer.observe(el));
+}
+
+// ── CATEGORY FILTERS ──────────────────────────────────────────────────────
+async function populateFilters() {
+    // Fetch distinct categories from published articles
+    const { data } = await supabase
+        .from('articles')
+        .select('category')
+        .eq('is_published', true);
+
+    if (!data) return;
+    const categories = [...new Set(data.map(a => a.category))].filter(Boolean);
+    const bar        = document.getElementById('filter-bar');
+
+    categories.forEach(cat => {
+        if (bar.querySelector(`[data-category="${cat}"]`)) return;
+        const btn = document.createElement('button');
+        btn.className       = 'filter-pill';
+        btn.dataset.category = cat;
+        btn.textContent     = cat;
+        bar.appendChild(btn);
+    });
+}
+
+document.getElementById('filter-bar').addEventListener('click', e => {
+    const pill = e.target.closest('.filter-pill');
+    if (!pill) return;
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    activeCategory = pill.dataset.category;
+    loadArticles(true);
+});
+
+// ── LOAD MORE ─────────────────────────────────────────────────────────────
+document.getElementById('load-more-btn').addEventListener('click', () => {
+    const btn = document.getElementById('load-more-btn');
+    btn.disabled = true; btn.textContent = 'Loading…';
+    loadArticles(false);
+});
+
+// ── SCROLL REVEAL ─────────────────────────────────────────────────────────
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.1 });
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmtDate(iso) {
+    return new Date(iso).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+loadArticles(true);
+populateFilters();
+</script>
+</body>
+</html>

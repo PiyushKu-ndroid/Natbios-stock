@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loading… — Natbios</title>
+    <meta name="description" content="" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Cormorant Garamond: editorial serif matching the landing page -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --ink:      #09090f;
+            --ink-2:    #111119;
+            --border:   #ffffff0f;
+            --green:    #a4ea64;
+            --chalk:    #f0eef8;
+            --chalk-2:  #a09dba;
+            --chalk-3:  #5c5975;
+            --serif:    'Cormorant Garamond', Georgia, serif;
+            --body:     'DM Sans', system-ui, sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--body);
+            background:  var(--ink);
+            color:       var(--chalk);
+            -webkit-font-smoothing: antialiased;
+        }
+        a { color: inherit; text-decoration: none; }
+
+        /* ── NAV ── */
+        .nav {
+            position:        fixed; top: 0; left: 0; right: 0; z-index: 100;
+            display:         flex;
+            align-items:     center;
+            justify-content: space-between;
+            padding:         0 clamp(20px, 5vw, 60px);
+            height:          60px;
+            background:      rgba(9,9,15,.92);
+            backdrop-filter: blur(12px);
+            border-bottom:   1px solid var(--border);
+        }
+        .nav__logo {
+            display:     flex;
+            align-items: center;
+            gap:         8px;
+            font-family: var(--serif);
+            font-size:   1.2rem;
+        }
+        .nav__logo img { height: 28px; }
+        .nav__logo span { color: var(--green); }
+
+        .nav__links { display: flex; align-items: center; gap: 24px; }
+        .nav__link {
+            font-size:      0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color:          var(--chalk-2);
+            transition:     color 150ms ease;
+        }
+        .nav__link:hover { color: var(--chalk); }
+
+        /* ── HERO ── */
+        .hero {
+            position:    relative;
+            height:      70vh;
+            min-height:  480px;
+            overflow:    hidden;
+            margin-top:  60px;
+        }
+
+        #hero-image {
+            position:   absolute; inset: 0;
+            width:      100%; height: 100%;
+            object-fit: cover;
+            filter:     brightness(.65);
+        }
+
+        /* Dark gradient over image — text readable */
+        .hero__overlay {
+            position:   absolute; inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(9,9,15,.1) 0%,
+                rgba(9,9,15,.2) 40%,
+                rgba(9,9,15,.85) 100%
+            );
+        }
+
+        /* Grey placeholder shown while image loads */
+        .hero__placeholder {
+            position:   absolute; inset: 0;
+            background: linear-gradient(135deg, #111119 0%, #1a1a27 50%, #0d0d18 100%);
+        }
+
+        .hero__content {
+            position:    absolute;
+            bottom:      0; left: 0; right: 0;
+            padding:     0 clamp(20px, 8vw, 120px) 48px;
+            max-width:   900px;
+        }
+
+        .hero__category {
+            font-size:      0.68rem;
+            font-weight:    500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color:          var(--green);
+            margin-bottom:  14px;
+            display:        flex;
+            align-items:    center;
+            gap:            8px;
+        }
+        .hero__category::before {
+            content: ''; display: block;
+            width: 28px; height: 1px; background: var(--green);
+        }
+
+        #article-title {
+            font-family:  var(--serif);
+            font-size:    clamp(2rem, 5vw, 3.8rem);
+            font-weight:  600;
+            line-height:  1.05;
+            color:        #fff;
+            margin-bottom: 20px;
+            text-shadow:  0 2px 20px rgba(0,0,0,.4);
+        }
+
+        .hero__meta {
+            display:     flex;
+            align-items: center;
+            gap:         20px;
+            font-size:   0.78rem;
+            color:       rgba(255,255,255,.6);
+        }
+        .hero__meta span { display: flex; align-items: center; gap: 6px; }
+
+        /* ── ARTICLE BODY ── */
+        .article-wrap {
+            max-width: 720px;
+            margin:    0 auto;
+            padding:   56px clamp(20px, 5vw, 40px) 80px;
+        }
+
+        /* Share bar */
+        .share-bar {
+            display:       flex;
+            align-items:   center;
+            gap:           12px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+        .share-bar__label {
+            font-size:      0.7rem;
+            font-weight:    500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color:          var(--chalk-3);
+        }
+        .share-btn {
+            width:         36px; height: 36px;
+            border-radius: 50%;
+            background:    var(--ink-2);
+            border:        1px solid var(--border);
+            color:         var(--chalk-2);
+            font-size:     0.8rem;
+            display:       flex;
+            align-items:   center;
+            justify-content: center;
+            cursor:        pointer;
+            transition:    background 150ms ease, color 150ms ease;
+        }
+        .share-btn:hover { background: var(--green); color: #000; border-color: var(--green); }
+
+        /* Article text */
+        #article-body {
+            font-family:  var(--serif);
+            font-size:    clamp(1.1rem, 1.8vw, 1.25rem);
+            font-weight:  400;
+            line-height:  1.8;
+            color:        rgba(240, 238, 248, 0.88);
+        }
+
+        /* Each paragraph */
+        #article-body p {
+            margin-bottom: 1.6em;
+        }
+
+        /* First paragraph drop cap — editorial touch */
+        #article-body p:first-child::first-letter {
+            font-family:  var(--serif);
+            font-size:    4.2rem;
+            font-weight:  600;
+            float:        left;
+            line-height:  0.75;
+            margin:       8px 10px 0 0;
+            color:        var(--green);
+        }
+
+        /* Pull quote — wrap text in [[ ]] in admin to auto-style */
+        .pull-quote {
+            border-left:   3px solid var(--green);
+            padding:       20px 28px;
+            margin:        2em 0;
+            font-style:    italic;
+            font-size:     1.3em;
+            color:         var(--chalk);
+            background:    rgba(164,234,100,.04);
+        }
+
+        /* ── RELATED / BACK ── */
+        .article-footer {
+            max-width:  720px;
+            margin:     0 auto;
+            padding:    0 clamp(20px, 5vw, 40px) 80px;
+        }
+
+        .article-footer__divider {
+            border: none; border-top: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        .article-footer__back {
+            display:     inline-flex;
+            align-items: center;
+            gap:         8px;
+            font-size:   0.78rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color:       var(--chalk-3);
+            transition:  color 150ms ease;
+            margin-bottom: 48px;
+        }
+        .article-footer__back:hover { color: var(--chalk); }
+
+        .related-title {
+            font-family:   var(--serif);
+            font-size:     1.6rem;
+            font-weight:   400;
+            margin-bottom: 24px;
+        }
+        .related-title em { font-style: italic; color: var(--green); }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap:     16px;
+        }
+
+        .related-card {
+            cursor:   pointer;
+            overflow: hidden;
+        }
+        .related-card__image {
+            width:        100%;
+            aspect-ratio: 16/9;
+            object-fit:   cover;
+            background:   var(--ink-2);
+            display:      block;
+            margin-bottom: 12px;
+            transition:   transform 300ms ease;
+        }
+        .related-card:hover .related-card__image { transform: scale(1.03); }
+        .related-card__category {
+            font-size:      0.62rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color:          var(--green);
+            margin-bottom:  5px;
+        }
+        .related-card__title {
+            font-family: var(--serif);
+            font-size:   1rem;
+            font-weight: 400;
+            line-height: 1.3;
+            color:       var(--chalk);
+        }
+
+        /* ── LOADING / ERROR STATES ── */
+        .state-screen {
+            min-height:     80vh;
+            display:        flex;
+            flex-direction: column;
+            align-items:    center;
+            justify-content: center;
+            gap:            16px;
+            color:          var(--chalk-3);
+            text-align:     center;
+            padding:        40px;
+        }
+        .state-screen__icon  { font-size: 2.5rem; opacity: .3; }
+        .state-screen__title { font-family: var(--serif); font-size: 1.6rem; color: var(--chalk); }
+        .state-screen__sub   { font-size: 0.85rem; max-width: 360px; line-height: 1.6; }
+
+        .spinner {
+            width: 32px; height: 32px;
+            border: 2px solid var(--border);
+            border-top-color: var(--green);
+            border-radius: 50%;
+            animation: spin 700ms linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── FOOTER ── */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding:    32px clamp(20px, 5vw, 60px);
+            display:    flex;
+            align-items: center;
+            justify-content: space-between;
+            gap:         16px;
+            flex-wrap:   wrap;
+        }
+        .footer__logo { font-family: var(--serif); font-size: 1rem; color: var(--chalk-3); }
+        .footer__logo span { color: var(--green); }
+        .footer__copy { font-size: 0.72rem; color: var(--chalk-3); }
+
+        @media (max-width: 680px) {
+            .hero { height: 55vh; }
+            .related-grid { grid-template-columns: 1fr; }
+            .nav__links { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+    <a href="landing.html" class="nav__logo">
+        <img src="logo.png" alt="Natbios" onerror="this.style.display='none'" />
+        <span>Stock</span>
+    </a>
+    <div class="nav__links">
+        <a href="articles.html" class="nav__link">Field Notes</a>
+        <a href="index.html" class="nav__link">Stock Library</a>
+        <a href="landing.html#collections" class="nav__link">Collections</a>
+    </div>
+</nav>
+
+<!-- CONTENT — swapped in by JS -->
+<div id="content">
+    <div class="state-screen" style="margin-top:60px">
+        <div class="spinner"></div>
+        <p>Loading article…</p>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer__logo">Natbios <span>Stock</span></div>
+    <p class="footer__copy">© <span id="year"></span> Natbios. All rights reserved.</p>
+</footer>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL  = 'https://edbydwpdyzbowcnhlzkb.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkYnlkd3BkeXpib3djbmhsemtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1Mjc0MTQsImV4cCI6MjEwMTEwMzQxNH0.Rb0porIQKtLYjfKL9qETOGqM2vXJPqwQ1Wa0pU00lu4';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
+    auth: { persistSession: true }
+});
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ── Read slug from URL: article.html?slug=a-quiet-sentinel ───────────────
+const slug = new URLSearchParams(window.location.search).get('slug');
+
+if (!slug) {
+    showError('No article specified', 'Try visiting from the articles listing page.');
+} else {
+    loadArticle(slug);
+}
+
+async function loadArticle(slug) {
+    const { data: article, error } = await supabase
+        .from('articles')
+        .select('*')
+        .eq('slug', slug)
+        .eq('is_published', true)
+        .single();
+
+    if (error || !article) {
+        showError('Article not found', 'This article may have been removed or the link is incorrect.');
+        return;
+    }
+
+    // Update page meta
+    document.title = `${article.title} — Natbios`;
+    document.querySelector('meta[name="description"]')
+        ?.setAttribute('content', article.excerpt ?? '');
+
+    // Render
+    renderArticle(article);
+
+    // Load related articles
+    loadRelated(article.category, article.id);
+}
+
+function renderArticle(a) {
+    const categoryLine = a.location
+        ? `${esc(a.category)} / ${esc(a.location)}`
+        : esc(a.category);
+
+    const dateStr = new Date(a.created_at).toLocaleDateString('en-IN', {
+        day: 'numeric', month: 'long', year: 'numeric'
+    });
+
+    document.getElementById('content').innerHTML = `
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero__placeholder"></div>
+            ${a.cover_image
+                ? `<img id="hero-image" src="${esc(a.cover_image)}" alt="${esc(a.title)}" />`
+                : ''}
+            <div class="hero__overlay"></div>
+            <div class="hero__content">
+                <p class="hero__category">${categoryLine}</p>
+                <h1 id="article-title">${esc(a.title)}</h1>
+                <div class="hero__meta">
+                    <span>By ${esc(a.author)}</span>
+                    <span>·</span>
+                    <span>${dateStr}</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- BODY -->
+        <article class="article-wrap">
+            <!-- Share bar -->
+            <div class="share-bar">
+                <span class="share-bar__label">Share</span>
+                <button class="share-btn" onclick="shareTwitter()" title="Share on X">𝕏</button>
+                <button class="share-btn" onclick="shareFacebook()" title="Share on Facebook">f</button>
+                <button class="share-btn" onclick="copyLink()" title="Copy link" id="copy-btn">🔗</button>
+            </div>
+
+            <!-- Body text — paragraphs split by blank lines -->
+            <div id="article-body">${formatBody(a.body)}</div>
+        </article>
+
+        <!-- RELATED -->
+        <div class="article-footer">
+            <hr class="article-footer__divider" />
+            <a href="articles.html" class="article-footer__back">← Back to Field Notes</a>
+            <h2 class="related-title">More from <em>Field Notes</em></h2>
+            <div class="related-grid" id="related-grid">
+                <p style="color:var(--chalk-3);font-size:.82rem">Loading…</p>
+            </div>
+        </div>
+    `;
+}
+
+// Convert plain text with blank-line paragraphs into HTML
+function formatBody(text) {
+    if (!text) return '';
+    return text
+        .split(/\n\s*\n/)          // split on blank lines
+        .map(para => para.trim())
+        .filter(Boolean)
+        .map(para => `<p>${esc(para).replace(/\n/g, '<br />')}</p>`)
+        .join('');
+}
+
+async function loadRelated(category, excludeId) {
+    const { data: articles } = await supabase
+        .from('articles')
+        .select('id, title, slug, category, cover_image')
+        .eq('is_published', true)
+        .eq('category', category)
+        .neq('id', excludeId)
+        .limit(3);
+
+    const grid = document.getElementById('related-grid');
+    if (!grid) return;
+
+    if (!articles?.length) {
+        grid.innerHTML = '<p style="color:var(--chalk-3);font-size:.82rem;grid-column:1/-1">No related articles yet.</p>';
+        return;
+    }
+
+    grid.innerHTML = articles.map(a => `
+        <div class="related-card" onclick="window.location='article.html?slug=${esc(a.slug)}'">
+            <img class="related-card__image"
+                 src="${esc(a.cover_image || '')}"
+                 onerror="this.style.opacity='.2'"
+                 alt="${esc(a.title)}" />
+            <p class="related-card__category">${esc(a.category)}</p>
+            <p class="related-card__title">${esc(a.title)}</p>
+        </div>
+    `).join('');
+}
+
+// ── Share helpers ─────────────────────────────────────────────────────────
+window.shareTwitter  = () => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(location.href)}&text=${encodeURIComponent(document.title)}`);
+window.shareFacebook = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}`);
+window.copyLink      = () => {
+    navigator.clipboard.writeText(location.href).then(() => {
+        const btn = document.getElementById('copy-btn');
+        if (btn) { btn.textContent = '✓'; setTimeout(() => btn.textContent = '🔗', 2000); }
+    });
+};
+
+function showError(title, sub) {
+    document.getElementById('content').innerHTML = `
+        <div class="state-screen" style="margin-top:60px">
+            <div class="state-screen__icon">🌿</div>
+            <p class="state-screen__title">${title}</p>
+            <p class="state-screen__sub">${sub}</p>
+            <a href="articles.html" style="font-size:.78rem;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-top:8px">← Back to Field Notes</a>
+        </div>`;
+}
+
+function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Natbios Admin — Articles</title>
+    <!-- No indexing — this page must stay hidden from search engines -->
+    <meta name="robots" content="noindex, nofollow" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --ink:      #09090f;
+            --ink-2:    #111119;
+            --ink-3:    #1a1a27;
+            --border:   #ffffff0f;
+            --green:    #a4ea64;
+            --chalk:    #f0eef8;
+            --chalk-2:  #a09dba;
+            --chalk-3:  #5c5975;
+            --error:    #f87171;
+            --success:  #4ade80;
+            --font:     'Inter', system-ui, sans-serif;
+            --serif:    'Playfair Display', Georgia, serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font);
+            background:  var(--ink);
+            color:       var(--chalk);
+            min-height:  100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { color: inherit; text-decoration: none; }
+        button { font-family: var(--font); cursor: pointer; border: none; }
+        input, textarea, select { font-family: var(--font); outline: none; }
+
+        /* ── AUTH GATE ── */
+        #auth-gate {
+            position:   fixed; inset: 0; z-index: 999;
+            background: var(--ink);
+            display:    flex; align-items: center; justify-content: center;
+        }
+        .auth-box {
+            background:    var(--ink-2);
+            border:        1px solid var(--border);
+            border-radius: 8px;
+            padding:       48px 40px;
+            width:         100%; max-width: 380px;
+        }
+        .auth-box h1 {
+            font-family:   var(--serif);
+            font-size:     1.6rem;
+            margin-bottom: 6px;
+        }
+        .auth-box p {
+            font-size:     0.82rem;
+            color:         var(--chalk-3);
+            margin-bottom: 28px;
+        }
+        .auth-box p span { color: var(--green); }
+
+        /* ── LAYOUT ── */
+        .topbar {
+            display:         flex;
+            align-items:     center;
+            justify-content: space-between;
+            padding:         0 32px;
+            height:          60px;
+            background:      var(--ink-2);
+            border-bottom:   1px solid var(--border);
+            position:        sticky; top: 0; z-index: 50;
+        }
+        .topbar__logo {
+            font-family: var(--serif);
+            font-size:   1.1rem;
+            color:       var(--chalk);
+        }
+        .topbar__logo span { color: var(--green); }
+        .topbar__user {
+            font-size:  0.78rem;
+            color:      var(--chalk-3);
+            display:    flex; align-items: center; gap: 12px;
+        }
+
+        .main { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+        .page-title {
+            font-family:   var(--serif);
+            font-size:     1.8rem;
+            margin-bottom: 6px;
+        }
+        .page-sub { font-size: 0.82rem; color: var(--chalk-3); margin-bottom: 36px; }
+
+        /* ── TABS ── */
+        .tabs { display: flex; gap: 4px; margin-bottom: 32px; }
+        .tab {
+            padding:       9px 20px;
+            font-size:     0.8rem;
+            font-weight:   500;
+            border-radius: 4px;
+            background:    transparent;
+            color:         var(--chalk-3);
+            border:        1px solid var(--border);
+            transition:    all 150ms ease;
+        }
+        .tab.active, .tab:hover { background: var(--green); color: #000; border-color: var(--green); }
+
+        /* ── FORM ── */
+        .card {
+            background:    var(--ink-2);
+            border:        1px solid var(--border);
+            border-radius: 8px;
+            padding:       32px;
+            margin-bottom: 24px;
+        }
+        .card__title {
+            font-size:     0.72rem;
+            font-weight:   600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color:         var(--chalk-3);
+            margin-bottom: 20px;
+        }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group {
+            display:        flex;
+            flex-direction: column;
+            gap:            6px;
+            margin-bottom:  16px;
+        }
+        .form-group.span-2 { grid-column: 1 / -1; }
+        .form-group label {
+            font-size:      0.7rem;
+            font-weight:    600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color:          var(--chalk-3);
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding:       10px 13px;
+            background:    var(--ink);
+            border:        1px solid rgba(255,255,255,.1);
+            border-radius: 4px;
+            color:         var(--chalk);
+            font-size:     0.875rem;
+            transition:    border-color 150ms ease;
+            resize:        vertical;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus { border-color: var(--green); }
+        .form-group textarea { min-height: 280px; line-height: 1.6; }
+        .form-group select option { background: var(--ink-2); }
+
+        /* Slug preview */
+        .slug-preview {
+            font-size:   0.72rem;
+            color:       var(--chalk-3);
+            margin-top:  4px;
+            font-family: monospace;
+        }
+        .slug-preview span { color: var(--green); }
+
+        /* Image upload area */
+        .image-upload-area {
+            border:        2px dashed rgba(255,255,255,.12);
+            border-radius: 4px;
+            padding:       32px;
+            text-align:    center;
+            cursor:        pointer;
+            transition:    border-color 150ms ease, background 150ms ease;
+            position:      relative;
+        }
+        .image-upload-area:hover { border-color: var(--green); background: rgba(164,234,100,.03); }
+        .image-upload-area input[type="file"] {
+            position: absolute; inset: 0; opacity: 0; cursor: pointer;
+            width: 100%; height: 100%;
+        }
+        .image-upload-area__icon { font-size: 1.8rem; opacity: .4; margin-bottom: 8px; }
+        .image-upload-area__text { font-size: 0.82rem; color: var(--chalk-3); }
+        .image-upload-area__text span { color: var(--green); }
+        #image-preview {
+            width: 100%; max-height: 200px; object-fit: cover;
+            border-radius: 4px; margin-top: 12px; display: none;
+        }
+
+        /* Publish toggle */
+        .publish-row {
+            display:     flex;
+            align-items: center;
+            justify-content: space-between;
+            padding:     16px 20px;
+            background:  var(--ink);
+            border:      1px solid rgba(255,255,255,.08);
+            border-radius: 4px;
+        }
+        .publish-row__label { font-size: 0.85rem; }
+        .publish-row__sub   { font-size: 0.72rem; color: var(--chalk-3); margin-top: 2px; }
+        .toggle {
+            position: relative; width: 44px; height: 24px;
+            background: rgba(255,255,255,.1); border-radius: 999px;
+            cursor: pointer; transition: background 200ms ease;
+            border: none; flex-shrink: 0;
+        }
+        .toggle.on { background: var(--green); }
+        .toggle::after {
+            content: ''; position: absolute;
+            width: 18px; height: 18px; border-radius: 50%;
+            background: #fff; top: 3px; left: 3px;
+            transition: transform 200ms ease;
+        }
+        .toggle.on::after { transform: translateX(20px); }
+
+        /* Submit button */
+        .btn-submit {
+            width:          100%;
+            padding:        14px;
+            background:     var(--green);
+            color:          #000;
+            font-size:      0.85rem;
+            font-weight:    600;
+            letter-spacing: 0.05em;
+            border-radius:  4px;
+            margin-top:     8px;
+            transition:     background 150ms ease, opacity 150ms ease;
+        }
+        .btn-submit:hover    { background: #8fd94a; }
+        .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+        .btn-ghost-sm {
+            padding:       7px 14px;
+            font-size:     0.75rem;
+            font-weight:   500;
+            border-radius: 4px;
+            background:    transparent;
+            color:         var(--chalk-3);
+            border:        1px solid rgba(255,255,255,.1);
+            transition:    all 150ms ease;
+        }
+        .btn-ghost-sm:hover { color: var(--chalk); border-color: rgba(255,255,255,.25); }
+
+        .btn-danger-sm {
+            padding:       7px 14px;
+            font-size:     0.75rem;
+            font-weight:   500;
+            border-radius: 4px;
+            background:    transparent;
+            color:         var(--error);
+            border:        1px solid var(--error);
+            transition:    all 150ms ease;
+        }
+        .btn-danger-sm:hover { background: var(--error); color: #fff; }
+
+        /* ── ARTICLES LIST ── */
+        .article-row {
+            display:       grid;
+            grid-template-columns: 64px 1fr auto;
+            gap:           16px;
+            align-items:   center;
+            padding:       16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .article-row:last-child { border-bottom: none; }
+        .article-row__thumb {
+            width:  64px; height: 48px;
+            object-fit: cover; border-radius: 3px;
+            background: var(--ink-3);
+        }
+        .article-row__title { font-size: 0.875rem; font-weight: 500; margin-bottom: 3px; }
+        .article-row__meta  { font-size: 0.72rem; color: var(--chalk-3); }
+        .article-row__actions { display: flex; gap: 8px; }
+
+        .badge {
+            display:        inline-block;
+            padding:        2px 8px;
+            border-radius:  999px;
+            font-size:      0.62rem;
+            font-weight:    600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .badge-live    { background: rgba(74,222,128,.15); color: var(--success); }
+        .badge-draft   { background: rgba(255,255,255,.07); color: var(--chalk-3); }
+
+        /* ── TOAST ── */
+        #toast-container {
+            position: fixed; bottom: 24px; right: 24px; z-index: 500;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            padding: 12px 18px; border-radius: 6px;
+            font-size: 0.875rem; font-weight: 500;
+            background: var(--ink-2); border: 1px solid rgba(255,255,255,.1);
+            color: var(--chalk); animation: toast-in 250ms ease forwards;
+        }
+        .toast.success { border-color: var(--success); }
+        .toast.error   { border-color: var(--error); }
+        @keyframes toast-in {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── FORM SECTION HIDDEN ── */
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        /* ── EMPTY STATE ── */
+        .empty {
+            text-align: center; padding: 48px 24px;
+            color: var(--chalk-3); font-size: 0.85rem;
+        }
+        .empty span { display: block; font-size: 2rem; margin-bottom: 12px; opacity: .3; }
+
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+            .main { padding: 24px 16px 60px; }
+            .card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ======================================================================
+     AUTH GATE — shown until session is verified
+====================================================================== -->
+<div id="auth-gate">
+    <div class="auth-box">
+        <h1>Natbios Admin</h1>
+        <p>Sign in to manage articles. Only authorised accounts can access this panel. <span>Not linked anywhere on the site.</span></p>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input id="auth-email" type="email" placeholder="you@natbios.com" autocomplete="email" />
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input id="auth-password" type="password" placeholder="••••••••" />
+        </div>
+        <button class="btn-submit" id="auth-btn" style="margin-top:0">Sign in</button>
+        <p id="auth-error" style="color:var(--error);font-size:.78rem;margin-top:12px;text-align:center;min-height:18px"></p>
+    </div>
+</div>
+
+<!-- ======================================================================
+     APP (hidden until auth confirmed)
+====================================================================== -->
+<div id="app" style="display:none">
+
+    <header class="topbar">
+        <div class="topbar__logo">Natbios <span>Admin</span></div>
+        <div class="topbar__user">
+            <span id="admin-email"></span>
+            <button class="btn-ghost-sm" id="logout-btn">Sign out</button>
+        </div>
+    </header>
+
+    <main class="main">
+        <h1 class="page-title">Articles</h1>
+        <p class="page-sub">Publish and manage Field Notes & Science articles. Changes appear on the website instantly.</p>
+
+        <div class="tabs">
+            <button class="tab active" data-panel="write">✏️ Write New Article</button>
+            <button class="tab" data-panel="manage">📋 Manage Articles</button>
+        </div>
+
+        <!-- ── WRITE PANEL ── -->
+        <div class="panel active" id="panel-write">
+
+            <!-- Basic info -->
+            <div class="card">
+                <p class="card__title">Article Details</p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Title *</label>
+                        <input id="f-title" type="text" placeholder="A Quiet Sentinel of Bihar's Rivers" maxlength="200" />
+                        <div class="slug-preview">URL slug: natbios.com/articles/<span id="slug-preview">...</span></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Author</label>
+                        <input id="f-author" type="text" placeholder="Natbios Team" value="Natbios Team" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="f-category">
+                            <option value="">Select category…</option>
+                            <option value="WILDLIFE">Wildlife</option>
+                            <option value="NATURE">Nature</option>
+                            <option value="RIVER WILDLIFE">River Wildlife</option>
+                            <option value="FOREST LIFE">Forest Life</option>
+                            <option value="BIRDS">Birds</option>
+                            <option value="SCIENCE">Science</option>
+                            <option value="CONSERVATION">Conservation</option>
+                            <option value="EXPEDITIONS">Expeditions</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input id="f-location" type="text" placeholder="Valmiki, Bihar" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Excerpt (shown on article cards)</label>
+                    <textarea id="f-excerpt" style="min-height:80px" placeholder="A short 1-2 sentence summary shown on the homepage and article listing…" maxlength="300"></textarea>
+                </div>
+            </div>
+
+            <!-- Cover image -->
+            <div class="card">
+                <p class="card__title">Cover Image</p>
+                <div class="image-upload-area" id="upload-area">
+                    <input type="file" id="f-image" accept="image/jpeg,image/png,image/webp" />
+                    <div class="image-upload-area__icon">🖼</div>
+                    <p class="image-upload-area__text">Drop image here or <span>click to browse</span></p>
+                    <p class="image-upload-area__text" style="font-size:.7rem;margin-top:4px">JPEG, PNG, WebP — recommended 1600×900px</p>
+                </div>
+                <img id="image-preview" alt="Cover preview" />
+            </div>
+
+            <!-- Article body -->
+            <div class="card">
+                <p class="card__title">Article Body</p>
+                <p style="font-size:.75rem;color:var(--chalk-3);margin-bottom:12px">
+                    Write your article below. Use blank lines between paragraphs. They will be formatted automatically on the website.
+                </p>
+                <div class="form-group">
+                    <textarea id="f-body" placeholder="Resting at the water's edge, the gharial carries the stillness of a healthy river…
+
+This remarkable reptile is a reminder that clean currents, undisturbed sandbanks, and patient protection are inseparable.
+
+Start a new paragraph by leaving a blank line above it."></textarea>
+                </div>
+            </div>
+
+            <!-- Publish settings -->
+            <div class="card">
+                <p class="card__title">Publishing</p>
+                <div class="publish-row">
+                    <div>
+                        <div class="publish-row__label">Publish immediately</div>
+                        <div class="publish-row__sub">Article appears on the website as soon as you save</div>
+                    </div>
+                    <button class="toggle" id="publish-toggle" role="switch" aria-checked="false"></button>
+                </div>
+            </div>
+
+            <button class="btn-submit" id="save-btn">Save & Publish Article</button>
+            <p id="save-status" style="text-align:center;font-size:.78rem;margin-top:12px;min-height:18px;color:var(--chalk-3)"></p>
+        </div>
+
+        <!-- ── MANAGE PANEL ── -->
+        <div class="panel" id="panel-manage">
+            <div class="card" style="padding:0;overflow:hidden">
+                <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+                    <p class="card__title" style="margin:0">All Articles</p>
+                    <button class="btn-ghost-sm" id="refresh-btn">↻ Refresh</button>
+                </div>
+                <div id="articles-list">
+                    <div class="empty"><span>📄</span>Loading articles…</div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+// ── CONFIG — same values as your app.js ──────────────────────────────────
+const SUPABASE_URL  = 'https://edbydwpdyzbowcnhlzkb.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkYnlkd3BkeXpib3djbmhsemtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1Mjc0MTQsImV4cCI6MjEwMTEwMzQxNH0.Rb0porIQKtLYjfKL9qETOGqM2vXJPqwQ1Wa0pU00lu4';
+// ─────────────────────────────────────────────────────────────────────────
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
+    auth: { persistSession: true, autoRefreshToken: true }
+});
+
+// ── TOAST ────────────────────────────────────────────────────────────────
+function toast(msg, type = '') {
+    const c = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    c.appendChild(el);
+    setTimeout(() => { el.style.opacity='0'; el.style.transition='300ms'; setTimeout(()=>el.remove(),300); }, 4000);
+}
+
+// ── SLUG generator ───────────────────────────────────────────────────────
+function toSlug(str) {
+    return str.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim().replace(/\s+/g, '-')
+        .replace(/-+/g, '-').slice(0, 80);
+}
+
+// ── AUTH ─────────────────────────────────────────────────────────────────
+async function init() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) showApp(session.user);
+    else         showGate();
+}
+
+function showGate() {
+    document.getElementById('auth-gate').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+}
+
+function showApp(user) {
+    document.getElementById('auth-gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('admin-email').textContent = user.email;
+    loadArticles();
+}
+
+document.getElementById('auth-btn').addEventListener('click', async () => {
+    const email    = document.getElementById('auth-email').value.trim();
+    const password = document.getElementById('auth-password').value;
+    const errEl    = document.getElementById('auth-error');
+    const btn      = document.getElementById('auth-btn');
+    errEl.textContent = '';
+    btn.disabled = true; btn.textContent = 'Signing in…';
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    btn.disabled = false; btn.textContent = 'Sign in';
+
+    if (error) { errEl.textContent = error.message; return; }
+    showApp(data.user);
+});
+
+document.getElementById('logout-btn').addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    showGate();
+});
+
+// ── TABS ─────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(`panel-${tab.dataset.panel}`).classList.add('active');
+        if (tab.dataset.panel === 'manage') loadArticles();
+    });
+});
+
+// ── SLUG PREVIEW ─────────────────────────────────────────────────────────
+document.getElementById('f-title').addEventListener('input', e => {
+    document.getElementById('slug-preview').textContent = toSlug(e.target.value) || '...';
+});
+
+// ── PUBLISH TOGGLE ───────────────────────────────────────────────────────
+let isPublished = false;
+document.getElementById('publish-toggle').addEventListener('click', function() {
+    isPublished = !isPublished;
+    this.classList.toggle('on', isPublished);
+    this.setAttribute('aria-checked', isPublished);
+    document.getElementById('save-btn').textContent =
+        isPublished ? 'Save & Publish Article' : 'Save as Draft';
+});
+
+// ── IMAGE PREVIEW ─────────────────────────────────────────────────────────
+document.getElementById('f-image').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const preview = document.getElementById('image-preview');
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = 'block';
+});
+
+// ── SAVE ARTICLE ─────────────────────────────────────────────────────────
+document.getElementById('save-btn').addEventListener('click', async () => {
+    const title    = document.getElementById('f-title').value.trim();
+    const category = document.getElementById('f-category').value;
+    const body     = document.getElementById('f-body').value.trim();
+    const statusEl = document.getElementById('save-status');
+    const btn      = document.getElementById('save-btn');
+
+    if (!title)    { toast('Title is required', 'error'); return; }
+    if (!category) { toast('Please select a category', 'error'); return; }
+    if (!body)     { toast('Article body cannot be empty', 'error'); return; }
+
+    btn.disabled = true; btn.textContent = 'Saving…';
+    statusEl.textContent = 'Uploading image…';
+
+    // Upload cover image to Supabase Storage
+    let coverUrl = null;
+    const imageFile = document.getElementById('f-image').files[0];
+    if (imageFile) {
+        const ext  = imageFile.name.split('.').pop();
+        const path = `articles/${Date.now()}.${ext}`;
+        const { error: uploadErr } = await supabase.storage
+            .from('thumbnails') // reuse existing public bucket
+            .upload(path, imageFile, { upsert: true });
+
+        if (uploadErr) {
+            toast('Image upload failed: ' + uploadErr.message, 'error');
+            btn.disabled = false; btn.textContent = 'Save & Publish Article';
+            statusEl.textContent = '';
+            return;
+        }
+        const { data: { publicUrl } } = supabase.storage.from('thumbnails').getPublicUrl(path);
+        coverUrl = publicUrl;
+    }
+
+    statusEl.textContent = 'Saving article…';
+
+    const slug = toSlug(title);
+    const { error } = await supabase.from('articles').insert({
+        title,
+        slug,
+        category,
+        location:     document.getElementById('f-location').value.trim() || null,
+        excerpt:      document.getElementById('f-excerpt').value.trim() || null,
+        body,
+        cover_image:  coverUrl,
+        author:       document.getElementById('f-author').value.trim() || 'Natbios Team',
+        is_published: isPublished,
+    });
+
+    btn.disabled = false;
+    btn.textContent = isPublished ? 'Save & Publish Article' : 'Save as Draft';
+    statusEl.textContent = '';
+
+    if (error) {
+        toast(error.message.includes('slug') ? 'An article with this title already exists.' : error.message, 'error');
+        return;
+    }
+
+    toast(isPublished ? '✓ Article published!' : '✓ Draft saved!', 'success');
+
+    // Reset form
+    ['f-title','f-author','f-location','f-excerpt','f-body'].forEach(id => {
+        document.getElementById(id).value = id === 'f-author' ? 'Natbios Team' : '';
+    });
+    document.getElementById('f-category').value = '';
+    document.getElementById('slug-preview').textContent = '...';
+    document.getElementById('image-preview').style.display = 'none';
+    document.getElementById('f-image').value = '';
+    isPublished = false;
+    document.getElementById('publish-toggle').classList.remove('on');
+});
+
+// ── LOAD ARTICLES ─────────────────────────────────────────────────────────
+async function loadArticles() {
+    const list = document.getElementById('articles-list');
+    list.innerHTML = '<div class="empty"><span>⏳</span>Loading…</div>';
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    // Service role not available on frontend — use anon key with RLS off for author's own articles
+    // We fetch ALL articles (published + draft) using the authenticated session
+    const { data: articles, error } = await supabase
+        .from('articles')
+        .select('id, title, category, is_published, created_at, cover_image, slug')
+        .order('created_at', { ascending: false });
+
+    if (error || !articles?.length) {
+        list.innerHTML = '<div class="empty"><span>📄</span>No articles yet. Write your first one!</div>';
+        return;
+    }
+
+    list.innerHTML = articles.map(a => `
+        <div class="article-row" id="row-${a.id}">
+            <img class="article-row__thumb" src="${a.cover_image || ''}"
+                 onerror="this.style.opacity='.2'" alt="" />
+            <div>
+                <div class="article-row__title">${esc(a.title)}</div>
+                <div class="article-row__meta">
+                    ${esc(a.category)} · ${fmtDate(a.created_at)}
+                    <span class="badge ${a.is_published ? 'badge-live' : 'badge-draft'}" style="margin-left:8px">
+                        ${a.is_published ? 'Live' : 'Draft'}
+                    </span>
+                </div>
+            </div>
+            <div class="article-row__actions">
+                <button class="btn-ghost-sm" onclick="togglePublish('${a.id}', ${a.is_published})">
+                    ${a.is_published ? 'Unpublish' : 'Publish'}
+                </button>
+                <button class="btn-danger-sm" onclick="deleteArticle('${a.id}')">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+document.getElementById('refresh-btn').addEventListener('click', loadArticles);
+
+// ── TOGGLE PUBLISH ────────────────────────────────────────────────────────
+window.togglePublish = async (id, current) => {
+    const { error } = await supabase.from('articles')
+        .update({ is_published: !current }).eq('id', id);
+    if (error) { toast(error.message, 'error'); return; }
+    toast(current ? 'Article unpublished' : 'Article published!', 'success');
+    loadArticles();
+};
+
+// ── DELETE ────────────────────────────────────────────────────────────────
+window.deleteArticle = async (id) => {
+    if (!confirm('Delete this article? This cannot be undone.')) return;
+    const { error } = await supabase.from('articles').delete().eq('id', id);
+    if (error) { toast(error.message, 'error'); return; }
+    toast('Article deleted', '');
+    loadArticles();
+};
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function esc(s) {
+    if (!s) return '';
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function fmtDate(iso) {
+    return new Date(iso).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+}
+
+init();
+</script>
+</body>
+</html>
